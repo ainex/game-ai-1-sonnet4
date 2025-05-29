@@ -22,9 +22,9 @@ run_validation() {
     local test_name="$1"
     local command="$2"
     local description="$3"
-    
+
     echo -n "  ✓ $description... "
-    
+
     if eval "$command" >/dev/null 2>&1; then
         echo "✅ PASS"
         return 0
@@ -73,7 +73,7 @@ failed_packages=0
 for ((i=0; i<${#packages[@]}; i+=2)); do
     package="${packages[i]}"
     description="${packages[i+1]}"
-    
+
     if ! run_validation "package_$package" "python_package_exists $package" "$description ($package)"; then
         ((failed_packages++))
     fi
@@ -95,7 +95,7 @@ failed_tools=0
 for ((i=0; i<${#dev_tools[@]}; i+=2)); do
     tool="${dev_tools[i]}"
     description="${dev_tools[i+1]}"
-    
+
     if ! run_validation "tool_$tool" "python_package_exists $tool" "$description ($tool)"; then
         ((failed_tools++))
     fi
@@ -124,7 +124,7 @@ failed_dirs=0
 for ((i=0; i<${#directories[@]}; i+=2)); do
     dir="${directories[i]}"
     description="${directories[i+1]}"
-    
+
     if ! run_validation "dir_$dir" "test -d $dir" "$description"; then
         ((failed_dirs++))
     fi
@@ -147,7 +147,7 @@ failed_files=0
 for ((i=0; i<${#files[@]}; i+=2)); do
     file="${files[i]}"
     description="${files[i+1]}"
-    
+
     if ! run_validation "file_$file" "test -f $file" "$description"; then
         ((failed_files++))
     fi
@@ -211,7 +211,7 @@ echo "🔧 Development Tools Validation:"
 # Check if pre-commit is configured
 if test -f ".pre-commit-config.yaml"; then
     echo "  ✓ Pre-commit configuration exists... ✅ PASS"
-    
+
     # Try to run pre-commit (if installed)
     if command_exists pre-commit; then
         if run_validation "pre_commit" "pre-commit run --all-files" "Pre-commit hooks run successfully"; then
@@ -266,7 +266,7 @@ if [[ $failed_checks -eq 0 ]]; then
     echo "- Screenshot capture system"
     echo "- LLM integration (mocked for offline development)"
     echo "- Client-server architecture"
-    
+
     exit 0
 else
     echo "⚠️  Some validation checks failed: $((total_checks - failed_checks))/$total_checks passed"
@@ -274,11 +274,11 @@ else
     echo "Issues found:"
     echo "- $failed_packages critical package(s) missing"
     echo "- $failed_tools development tool(s) missing"
-    echo "- $failed_dirs directory(ies) missing" 
+    echo "- $failed_dirs directory(ies) missing"
     echo "- $failed_files configuration file(s) missing"
     echo ""
     echo "💡 Try running './setup.sh' to fix these issues"
     echo "   Note: Some audio/visual features may require system-level packages"
-    
+
     exit 1
-fi 
+fi

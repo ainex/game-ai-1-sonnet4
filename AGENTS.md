@@ -106,7 +106,7 @@ pytest tests/ -v
 
 All external services MUST be mocked:
 - OpenAI API calls
-- Claude API calls  
+- Claude API calls
 - Speech-to-text services
 - Text-to-speech services
 - Any HTTP requests
@@ -334,4 +334,4 @@ MAX_IMAGE_SIZE=1920x1080
 
 ---
 
-*This guide should be updated as the Sims 4 AI Assistant project evolves and new patterns emerge.* 
+*This guide should be updated as the Sims 4 AI Assistant project evolves and new patterns emerge.*

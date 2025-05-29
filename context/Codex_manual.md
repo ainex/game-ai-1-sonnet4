@@ -10,7 +10,7 @@ Overview
 
 We believe in a future where developers drive the work they want to own, delegating toilsome tasks to agents. We see early signs of this future today at OpenAI, with Codex working in its own environment and drafting pull requests in our repos.
 
-**Codex vs. Codex CLI**  
+**Codex vs. Codex CLI**
 These docs cover Codex, a cloud-based agent you can find in your browser. For an open-source CLI agent you can run locally in your terminal, [install Codex CLI](https://github.com/openai/codex#openai-codex-cli).
 
 ### Video: Getting started with Codex
@@ -54,70 +54,70 @@ Below are some example tasks to get you started with Codex.
 Use ask mode to get advice and insights on your code, no changes applied.
 
 1.  **Refactoring suggestions**
-    
+
     Codex can help brainstorm structural improvements, such as splitting files, extracting functions, and tightening documentation.
-    
+
     ```text
     Take a look at <hairiest file in my codebase>.
     Can you suggest better ways to split it up, test it, and isolate functionality?
     ```
-    
+
 2.  **Q&A and architecture understanding**
-    
+
     Codex can answer deep questions about your codebase and generate diagrams.
-    
+
     ```text
     Document and create a mermaidjs diagram of the full request flow from the client
     endpoint to the database.
     ```
-    
+
 
 ### Code mode examples
 
 Use code mode when you want Codex to actively modify code and prepare a pull request.
 
 1.  **Security vulnerabilities**
-    
+
     Codex excels at auditing intricate logic and uncovering security flaws.
-    
+
     ```text
     There's a memory-safety vulnerability in <my package>. Find it and fix it.
     ```
-    
+
 2.  **Code review**
-    
+
     Append `.diff` to any pull request URL and include it in your prompt. Codex loads the patch inside the container.
-    
+
     ```text
     Please review my code and suggest improvements. The diff is below:
     <diff>
     ```
-    
+
 3.  **Adding tests**
-    
+
     After implementing initial changes, follow up with targeted test generation.
-    
+
     ```text
     From my branch, please add tests for the following files:
     <files>
     ```
-    
+
 4.  **Bug fixing**
-    
+
     A stack trace is usually enough for Codex to locate and correct the problem.
-    
+
     ```text
     Find and fix a bug in <my package>.
     ```
-    
+
 5.  **Product and UI fixes**
-    
+
     Although Codex cannot render a browser, it can resolve minor UI regressions.
-    
+
     ```text
     The modal on our onboarding page isn't centered. Can you fix it?
     ```
-    
+
 
 Environment configuration
 -------------------------

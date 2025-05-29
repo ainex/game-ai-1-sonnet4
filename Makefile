@@ -294,4 +294,4 @@ health:
 	@python -c "import sounddevice as sd; devices = sd.query_devices(); print(f'✅ {len(devices)} audio devices found')" 2>/dev/null || echo "⚠️ Audio system issues"
 	@echo ""
 	@echo "Database:"
-	@python -c "import sqlite3; conn = sqlite3.connect(':memory:'); print('✅ SQLite working')" 
+	@python -c "import sqlite3; conn = sqlite3.connect(':memory:'); print('✅ SQLite working')"

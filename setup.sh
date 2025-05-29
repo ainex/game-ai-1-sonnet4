@@ -25,51 +25,57 @@ check_sudo() {
 # Function to install system packages
 install_system_packages() {
     echo "📦 Installing system packages..."
-    
+
     check_sudo
-    
-    # Try to install system packages, but don't fail if there are issues
-    echo "Attempting to install system dependencies (this may fail on some systems)..."
-    
-    if $SUDO apt-get update && $SUDO apt-get install -y \
-        python3-dev \
-        python3-pip \
-        python3-venv \
-        build-essential \
-        pkg-config \
+
+    echo "Attempting to update package lists (will continue even if some sources fail)..."
+    $SUDO apt-get update || echo "⚠️  apt-get update encountered errors, but continuing with package installation attempts."
+
+    echo "Attempting to install critical audio/visual system dependencies..."
+    if $SUDO apt-get install -y --allow-downgrades --allow-remove-essential --allow-change-held-packages \
         portaudio19-dev \
         libasound2-dev \
         libpulse-dev \
         ffmpeg \
-        sqlite3 \
-        libsqlite3-dev \
-        git \
-        curl \
-        wget \
-        unzip \
-        xvfb \
         libgtk-3-dev \
         libx11-dev \
         libxext-dev \
         libxrandr-dev \
         libxss1 \
         libgconf-2-4 \
-        libnss3 \
-        libxss1 2>/dev/null; then
-        echo "✅ System packages installed successfully"
+        libnss3; then
+        echo "✅ Critical audio/visual system packages installed/updated successfully or already present."
     else
-        echo "⚠️  Some system packages failed to install - continuing with Python setup"
-        echo "   Audio/visual features may have limited functionality"
+        echo "⚠️  Some critical audio/visual system packages failed to install - Audio/visual features may have limited functionality."
+    fi
+
+    echo "Attempting to install remaining system dependencies..."
+    if $SUDO apt-get install -y --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+        python3-dev \
+        python3-pip \
+        python3-venv \
+        build-essential \
+        pkg-config \
+        sqlite3 \
+        libsqlite3-dev \
+        git \
+        curl \
+        wget \
+        unzip \
+        xvfb; then
+        echo "✅ Remaining system packages installed successfully or already present"
+    else
+        echo "⚠️  Some remaining system packages failed to install - continuing with Python setup"
     fi
 }
 
 # Function to install Python packages
 install_python_packages() {
     echo "📦 Installing Python packages..."
-    
+
     # Core development tools
     pip install --upgrade pip setuptools wheel
-    
+
     # Core dependencies - install in specific order to avoid conflicts
     echo "Installing core dependencies..."
     pip install --no-cache-dir \
@@ -136,35 +142,35 @@ install_python_packages() {
         mypy \
         bandit \
         pre-commit
-    
+
     echo "✅ Python packages installed successfully"
 }
 
 # Function to setup Python virtual environment
 setup_virtual_env() {
     echo "🐍 Setting up Python virtual environment..."
-    
+
     if [ ! -d "venv" ]; then
         python3 -m venv venv
         echo "✅ Virtual environment created"
     else
         echo "✅ Virtual environment already exists"
     fi
-    
+
     # Activate virtual environment and add to bashrc for persistence
     source venv/bin/activate
     echo "export PATH=\"$(pwd)/venv/bin:\$PATH\"" >> ~/.bashrc
     echo "export PYTHONPATH=\"$(pwd):\$PYTHONPATH\"" >> ~/.bashrc
     echo "export ENVIRONMENT=\"development\"" >> ~/.bashrc
     echo "export DATABASE_URL=\"sqlite:///./sims4_assistant.db\"" >> ~/.bashrc
-    
+
     echo "✅ Virtual environment activated"
 }
 
 # Function to create project structure
 create_project_structure() {
     echo "📁 Creating project directory structure..."
-    
+
     # Create main directories following client-server architecture
     mkdir -p server/src/{api,core,models,services,utils}
     mkdir -p server/src/api/{endpoints,middleware}
@@ -173,7 +179,7 @@ create_project_structure() {
     mkdir -p tests/{unit,integration,mocks}
     mkdir -p docs/{api,guides,examples}
     mkdir -p config/{development,production,test}
-    
+
     # Create __init__.py files for Python packages
     touch server/__init__.py
     touch server/src/__init__.py
@@ -184,26 +190,26 @@ create_project_structure() {
     touch server/src/models/__init__.py
     touch server/src/services/__init__.py
     touch server/src/utils/__init__.py
-    
+
     touch client/__init__.py
     touch client/src/__init__.py
     touch client/src/core/__init__.py
     touch client/src/ui/__init__.py
     touch client/src/utils/__init__.py
-    
+
     touch shared/__init__.py
     touch tests/__init__.py
     touch tests/unit/__init__.py
     touch tests/integration/__init__.py
     touch tests/mocks/__init__.py
-    
+
     echo "✅ Project structure created"
 }
 
 # Function to create requirements.txt
 create_requirements_file() {
     echo "📄 Creating requirements.txt..."
-    
+
     cat > requirements.txt << EOF
 # Core Framework
 fastapi==0.104.1
@@ -260,14 +266,14 @@ typer>=0.9.0
 sphinx>=7.0.0
 mkdocs>=1.5.0
 EOF
-    
+
     echo "✅ requirements.txt created"
 }
 
 # Function to create configuration files
 create_config_files() {
     echo "⚙️  Creating configuration files..."
-    
+
     # Create .gitignore
     cat > .gitignore << EOF
 # Python
@@ -340,7 +346,7 @@ htmlcov/
 docs/_build/
 site/
 EOF
-    
+
     # Create .env.example
     cat > .env.example << EOF
 # Sims 4 AI Gaming Assistant Environment Variables
@@ -376,7 +382,7 @@ SIMS4_INSTALL_PATH=/path/to/sims4
 SCREENSHOTS_DIR=./screenshots
 RECORDINGS_DIR=./recordings
 EOF
-    
+
     # Create pyproject.toml for tool configuration
     cat > pyproject.toml << EOF
 [tool.black]
@@ -457,14 +463,14 @@ exclude_lines = [
     "if __name__ == .__main__.:",
 ]
 EOF
-    
+
     echo "✅ Configuration files created"
 }
 
 # Function to setup pre-commit hooks
 setup_pre_commit() {
     echo "🔧 Setting up pre-commit hooks..."
-    
+
     cat > .pre-commit-config.yaml << EOF
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -482,7 +488,7 @@ repos:
     rev: 23.7.0
     hooks:
       - id: black
-        language_version: python3.11
+        language_version: python3.12
 
   - repo: https://github.com/pycqa/isort
     rev: 5.12.0
@@ -502,7 +508,7 @@ repos:
         additional_dependencies: [types-requests, types-PyYAML]
         args: [--config-file=pyproject.toml]
 EOF
-    
+
     # Install pre-commit hooks if pre-commit is available
     if command_exists pre-commit; then
         pre-commit install
@@ -515,7 +521,7 @@ EOF
 # Function to create sample test files
 create_sample_tests() {
     echo "🧪 Creating sample test files..."
-    
+
     # Create basic test structure
     cat > tests/test_environment.py << EOF
 """Test environment setup and dependencies."""
@@ -572,7 +578,7 @@ import responses
 
 class MockOpenAI:
     """Mock OpenAI API client."""
-    
+
     def __init__(self):
         self.chat = Mock()
         self.chat.completions = Mock()
@@ -581,7 +587,7 @@ class MockOpenAI:
 
 class MockClaude:
     """Mock Claude API client."""
-    
+
     def __init__(self):
         self.messages = Mock()
         self.messages.create = Mock()
@@ -592,7 +598,7 @@ MOCK_AUDIO_DATA = b"mock_audio_data"
 MOCK_IMAGE_DATA = b"mock_image_data"
 MOCK_LLM_RESPONSE = "This is a mock LLM response for testing."
 EOF
-    
+
     cat > tests/conftest.py << EOF
 """Pytest configuration and shared fixtures."""
 
@@ -637,14 +643,14 @@ def test_database_url():
     """Test database URL."""
     return "sqlite:///:memory:"
 EOF
-    
+
     echo "✅ Sample test files created"
 }
 
 # Function to create initial documentation
 create_initial_docs() {
     echo "📚 Creating initial documentation structure..."
-    
+
     # Create docs/index.md
     cat > docs/index.md << EOF
 # Sims 4 AI Gaming Assistant Documentation
@@ -681,7 +687,7 @@ This project follows the AI-Assisted Software Development Workflow:
 
 For more details, see the [AGENTS.md](../AGENTS.md) file.
 EOF
-    
+
     # Create API documentation template
     cat > docs/api/README.md << EOF
 # API Documentation
@@ -709,14 +715,14 @@ This directory contains API documentation for the Sims 4 AI Gaming Assistant.
 
 Documentation is automatically generated from FastAPI schemas.
 EOF
-    
+
     echo "✅ Initial documentation created"
 }
 
 # Function to verify installation
 verify_installation() {
     echo "🔍 Verifying installation..."
-    
+
     python3 -c "
 import sys
 print(f'Python version: {sys.version}')
@@ -732,58 +738,54 @@ except ImportError as e:
     print(f'❌ Import error: {e}')
     sys.exit(1)
 "
-    
+
     # Check system tools
     if command_exists sqlite3; then
         echo "✅ SQLite3 available"
     else
         echo "❌ SQLite3 not found"
     fi
-    
+
     if command_exists ffmpeg; then
         echo "✅ FFmpeg available"
     else
         echo "⚠️  FFmpeg not found (may affect audio processing)"
     fi
-    
+
     echo "✅ Installation verification complete"
 }
 
 # Main execution
 main() {
     echo "Starting Sims 4 AI Gaming Assistant setup..."
-    
-    # Check if system package installation is needed
-    if ! command_exists python3; then
-        echo "📦 Installing system packages (may require sudo)..."
-        install_system_packages
-    else
-        echo "✅ System packages already available"
-    fi
-    
+
+    # Always attempt to install/update system packages
+    echo "📦 Attempting to install/update system packages (this may require sudo)..."
+    install_system_packages
+
     # Setup virtual environment
     setup_virtual_env
-    
+
     # Create project structure
     create_project_structure
-    
+
     # Create configuration files
     create_requirements_file
     create_config_files
-    
+
     # Install packages
     install_python_packages
-    
+
     # Setup development tools
     setup_pre_commit
-    
+
     # Create sample files
     create_sample_tests
     create_initial_docs
-    
+
     # Verify everything works
     verify_installation
-    
+
     echo ""
     echo "🎉 Sims 4 AI Gaming Assistant development environment setup complete!"
     echo ""
@@ -798,4 +800,4 @@ main() {
 }
 
 # Run main function
-main "$@" 
+main "$@"

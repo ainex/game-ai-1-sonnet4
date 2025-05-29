@@ -205,4 +205,4 @@ make clean-plan         # Remove implementation plan
 
 The repository is now ready for productive work on a Sims 4 AI Gaming Assistant with OpenAI Codex! 🎮🎉
 
-*Generated for Sims 4 AI Gaming Assistant project* 
+*Generated for Sims 4 AI Gaming Assistant project*

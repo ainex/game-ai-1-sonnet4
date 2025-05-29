@@ -95,7 +95,7 @@ game-ai-1-sonnet4/
 This project follows a structured AI-assisted software development workflow:
 
 1. **Feature Planning**: Create detailed `IMPLEMENTATION_PLAN.md` documents before coding
-2. **Dependency Analysis**: AI-assisted identification of relevant code segments  
+2. **Dependency Analysis**: AI-assisted identification of relevant code segments
 3. **Step-by-Step Implementation**: Follow the detailed plan as single source of truth
 4. **Documentation & Cleanup**: Update module READMEs and remove implementation plans
 

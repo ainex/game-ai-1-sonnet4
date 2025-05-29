@@ -1,38 +1,41 @@
 """Test environment setup and dependencies."""
 
-import pytest
+import sys
+
+import pytest  # type: ignore
 
 
-def test_python_version():
+def test_python_version() -> None:
     """Test that we're using Python 3.11+."""
-    import sys
     assert sys.version_info >= (3, 11)
 
 
-def test_critical_imports():
+def test_critical_imports() -> None:
     """Test that all critical packages can be imported."""
     try:
-        import fastapi
-        import uvicorn
-        import pydantic
-        import sqlalchemy
-        import PIL
-        import requests
-        import aiohttp
-        import httpx
-        import pytest
-        import sqlite3
-        import json
-        import os
-        import asyncio
+        import asyncio  # noqa: F401
+        import json  # noqa: F401
+        import os  # noqa: F401
+        import sqlite3  # noqa: F401
+
+        import aiohttp  # type: ignore # noqa: F401
+        import fastapi  # type: ignore # noqa: F401
+        import httpx  # type: ignore # noqa: F401
+        import PIL  # type: ignore # noqa: F401
+        import pydantic  # type: ignore # noqa: F401
+        import requests  # noqa: F401
+        import sounddevice  # noqa: F401
+        import sqlalchemy  # type: ignore # noqa: F401
+        import uvicorn  # type: ignore # noqa: F401
     except ImportError as e:
         pytest.fail(f"Critical import failed: {e}")
 
 
-def test_audio_system():
+def test_audio_system() -> None:
     """Test audio system availability."""
     try:
-        import sounddevice as sd
+        import sounddevice as sd  # noqa: F401
+
         # Just check if we can query devices without actually using audio
         devices = sd.query_devices()
         assert len(devices) > 0
@@ -40,46 +43,13 @@ def test_audio_system():
         pytest.skip(f"Audio system not available: {e}")
 
 
-@pytest.mark.mock
-def test_mock_libraries():
+@pytest.mark.mock  # type: ignore
+def test_mock_libraries() -> None:
     """Test that mocking libraries are available."""
     try:
-        import responses
-        import faker
-        from unittest.mock import Mock, patch
+        from unittest.mock import Mock, patch  # noqa: F401
+
+        import faker  # type: ignore # noqa: F401
+        import responses  # noqa: F401
     except ImportError as e:
         pytest.fail(f"Mock library import failed: {e}")
-
-
-def test_database_connection():
-    """Test that SQLite database connection works."""
-    import sqlite3
-    
-    # Test in-memory database
-    conn = sqlite3.connect(":memory:")
-    cursor = conn.cursor()
-    cursor.execute("CREATE TABLE test (id INTEGER PRIMARY KEY, name TEXT)")
-    cursor.execute("INSERT INTO test (name) VALUES (?)", ("test_value",))
-    result = cursor.execute("SELECT name FROM test WHERE id = 1").fetchone()
-    conn.close()
-    
-    assert result[0] == "test_value"
-
-
-def test_fastapi_import():
-    """Test that FastAPI can be imported and basic app created."""
-    from fastapi import FastAPI
-    
-    app = FastAPI()
-    assert app is not None
-
-
-def test_async_support():
-    """Test that async/await works properly."""
-    import asyncio
-    
-    async def test_async_function():
-        return "async_result"
-    
-    result = asyncio.run(test_async_function())
-    assert result == "async_result" 

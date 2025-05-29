@@ -1,13 +1,13 @@
 """Mock implementations for external services."""
 
 from unittest.mock import Mock
-import responses
 
 
 class MockOpenAI:
     """Mock OpenAI API client."""
-    
-    def __init__(self):
+
+    def __init__(self) -> None:
+        """Initialize MockOpenAI."""
         self.chat = Mock()
         self.chat.completions = Mock()
         self.chat.completions.create = Mock()
@@ -15,8 +15,9 @@ class MockOpenAI:
 
 class MockClaude:
     """Mock Claude API client."""
-    
-    def __init__(self):
+
+    def __init__(self) -> None:
+        """Initialize MockClaude."""
         self.messages = Mock()
         self.messages.create = Mock()
 
