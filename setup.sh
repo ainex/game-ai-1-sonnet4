@@ -97,7 +97,7 @@ install_python_packages() {
     echo "Installing audio packages..."
     pip install --no-cache-dir \
         sounddevice==0.4.6 \
-        pyaudio==0.2.13 \
+        pyaudio==0.2.14 \
         pygame==2.5.2
 
     # HTTP clients
@@ -223,7 +223,7 @@ alembic==1.13.1
 
 # Audio Processing
 sounddevice==0.4.6
-pyaudio==0.2.13
+pyaudio==0.2.14
 pygame==2.5.2
 
 # Image Processing
@@ -381,7 +381,7 @@ EOF
     cat > pyproject.toml << EOF
 [tool.black]
 line-length = 88
-target-version = ['py311']
+target-version = ['py312']
 include = '\.pyi?$'
 extend-exclude = '''
 /(
@@ -405,7 +405,7 @@ known_first_party = ["server", "client", "shared"]
 known_third_party = ["fastapi", "sqlalchemy", "pytest", "sounddevice", "PIL"]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
