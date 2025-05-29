@@ -28,13 +28,20 @@ install_system_packages() {
 
     check_sudo
 
-    echo "Attempting to update package lists (will continue even if some sources fail)..."
-    $SUDO apt-get update || echo "⚠️  apt-get update encountered errors, but continuing with package installation attempts."
+    echo "Updating package lists..."
+    if ! $SUDO apt-get update; then
+        echo "⚠️  apt-get update failed. Please check your internet connection and package sources."
+        exit 1
+    fi
+    echo "✅ Package lists updated."
 
-    echo "Attempting to install critical audio/visual system dependencies..."
+    echo "Installing essential audio development packages (portaudio19-dev, libasound2-dev)..."
+    # Ensure these critical packages for PyAudio are installed. set -e will halt on failure.
+    $SUDO apt-get install -y portaudio19-dev libasound2-dev
+    echo "✅ Essential audio development packages (portaudio19-dev, libasound2-dev) installation attempted."
+
+    echo "Attempting to install other critical audio/visual system dependencies..."
     if $SUDO apt-get install -y --allow-downgrades --allow-remove-essential --allow-change-held-packages \
-        portaudio19-dev \
-        libasound2-dev \
         libpulse-dev \
         ffmpeg \
         libgtk-3-dev \
@@ -44,9 +51,9 @@ install_system_packages() {
         libxss1 \
         libgconf-2-4 \
         libnss3; then
-        echo "✅ Critical audio/visual system packages installed/updated successfully or already present."
+        echo "✅ Other critical audio/visual system packages installed/updated successfully or already present."
     else
-        echo "⚠️  Some critical audio/visual system packages failed to install - Audio/visual features may have limited functionality."
+        echo "⚠️  Some other critical audio/visual system packages failed to install - Audio/visual features may have limited functionality."
     fi
 
     echo "Attempting to install remaining system dependencies..."
