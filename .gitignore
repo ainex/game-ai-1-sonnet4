@@ -1,0 +1,145 @@
+# Python
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.vim/
+.netrwhist
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Project specific
+*.log
+.env
+.env.local
+.env.production
+.env.test
+.env.staging
+*.db
+*.sqlite
+*.sqlite3
+
+# Audio/Video files
+*.wav
+*.mp3
+*.mp4
+*.avi
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+screenshots/
+recordings/
+audio_cache/
+temp_recordings/
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Documentation
+docs/_build/
+site/
+
+# Machine Learning / AI Models
+*.pkl
+*.pickle
+*.joblib
+*.h5
+*.hdf5
+*.ckpt
+*.pth
+*.pt
+*.model
+models/checkpoints/
+models/weights/
+*.onnx
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb
+
+# Data files (large datasets should not be in git)
+data/raw/
+data/processed/
+*.csv
+*.json
+*.parquet
+*.feather
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+*.tmp
+*.temp
+*.cache
+*.pid
+*.lock
+
+# FastAPI specific
+instance/
+.webassets-cache
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Profiling
+*.prof
+
+# Local configuration overrides
+local_config.py
+local_settings.py
+
+# Game-specific files (Sims 4 Assistant)
+sims4_save_backups/
+game_state_cache/
+user_profiles/
+ai_conversation_logs/
