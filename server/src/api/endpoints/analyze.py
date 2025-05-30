@@ -14,7 +14,5 @@ async def analyze_situation(
     size = len(content)
     return {
         "image_size_bytes": size,
-        "message": (
-            "Screenshot and query received successfully. LLM processing placeholder."
-        ),
+        "message": ("Screenshot received. LLM processing placeholder."),
     }

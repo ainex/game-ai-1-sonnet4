@@ -48,6 +48,7 @@ pre-commit>=3.3.0
 rich==13.7.0
 tqdm>=4.65.0
 typer>=0.9.0
+keyboard==0.13.5
 
 # Documentation
 sphinx>=7.0.0

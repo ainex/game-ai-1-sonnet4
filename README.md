@@ -36,6 +36,23 @@ A **Windows desktop application that provides AI-powered gaming assistance for T
    pytest tests/ -v
    ```
 
+### Windows 11 Setup Notes
+
+The `setup.sh` script targets Linux environments. On Windows 11:
+
+1. Install **Python 3.11** from [python.org](https://www.python.org/).
+2. Create a virtual environment:
+   ```powershell
+   python -m venv venv
+   .\venv\Scripts\activate
+   ```
+3. Install dependencies manually:
+   ```powershell
+   pip install -r requirements.txt
+   pip install keyboard
+   ```
+4. Start the server and client as shown above.
+
 ## 📁 Project Structure
 
 ```

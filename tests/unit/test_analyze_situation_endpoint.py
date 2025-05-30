@@ -14,4 +14,4 @@ def test_analyze_situation_endpoint() -> None:
     assert response.status_code == 200
     payload = response.json()
     assert payload["image_size_bytes"] == len(image_content)
-    assert "Screenshot and query received" in payload["message"]
+    assert payload["message"].startswith("Screenshot received")
