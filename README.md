@@ -38,12 +38,22 @@ A **Windows desktop application that provides AI-powered gaming assistance for T
 
 ### Local AI Features
 
-The server includes offline image captioning and text-to-speech services.
-Endpoints:
+The server includes offline image captioning and text-to-speech services with GPU acceleration support.
 
+**API Endpoints:**
 - `POST /api/v1/image/analyze` - describe uploaded screenshot
 - `POST /api/v1/tts/speak` - synthesize speech from text
 - `POST /api/v1/game/analyze-and-speak` - analyze screenshot and return spoken description
+
+**GPU Acceleration:**
+- Supports NVIDIA RTX/GTX graphics cards
+- 10-20x faster TTS generation with CUDA
+- See [CUDA Setup Guide](docs/cuda-setup-guide.md) for installation instructions
+
+**Quick GPU Check:**
+```bash
+python scripts/verify_cuda.py
+```
 
 ### Windows 11 Setup Notes
 
