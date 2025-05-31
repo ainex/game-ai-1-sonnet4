@@ -60,17 +60,24 @@ python scripts/verify_cuda.py
 The `setup.sh` script targets Linux environments. On Windows 11:
 
 1. Install **Python 3.11** from [python.org](https://www.python.org/).
-2. Create a virtual environment:
+2. **Install Visual Studio Build Tools** (required for TTS):
+   ```powershell
+   winget install --id=Microsoft.VisualStudio.2022.BuildTools -e
+   ```
+   **Restart your computer after installation.**
+
+3. Create a virtual environment:
    ```powershell
    python -m venv venv
    .\venv\Scripts\activate
    ```
-3. Install dependencies manually:
+4. Install dependencies manually:
    ```powershell
    pip install -r requirements.txt
    pip install keyboard
    ```
-4. Start the server and client as shown above.
+
+**Troubleshooting**: If you encounter TTS installation errors, see our [Windows Troubleshooting Guide](docs/troubleshooting-windows-installation.md).
 
 ## 📁 Project Structure
 

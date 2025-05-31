@@ -18,6 +18,7 @@ Requirements:
 import sys
 import time
 from typing import Optional
+import os
 
 
 def check_python_version() -> bool:
@@ -91,6 +92,10 @@ def test_tts_gpu_performance() -> Optional[float]:
     print("\n=== TTS GPU Performance Test ===")
     
     try:
+        # Set environment variable BEFORE importing TTS or torch related to model loading
+        os.environ["TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD"] = "1"
+        print("ℹ️  Applied TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 to allow older model format.")
+
         from TTS.api import TTS
         import torch
         
@@ -113,10 +118,28 @@ def test_tts_gpu_performance() -> Optional[float]:
         print(f"Testing inference with text: '{test_text}'")
         
         start_inference = time.time()
-        audio = tts.tts(text=test_text, language="en")
+
+        # --- MODIFICATION FOR XTTS SPEAKER --- 
+        speaker_wav_path = "scripts/text_to_speech_audio.mp3"
+        print(f"ℹ️  Using speaker_wav: {speaker_wav_path}")
+
+        audio = tts.tts(text=test_text, language="en", speaker_wav=speaker_wav_path)
+        # --- END MODIFICATION ---
+
         inference_time = time.time() - start_inference
         
         print(f"✅ TTS inference completed in {inference_time:.2f} seconds")
+        
+        # Save the generated audio so user can hear it
+        output_path = "scripts/verification_test_output.wav"
+        tts.tts_to_file(
+            text=test_text, 
+            language="en", 
+            speaker_wav=speaker_wav_path,
+            file_path=output_path
+        )
+        print(f"💾 Audio saved to: {output_path}")
+        print("🔊 You can now play this file to hear the generated voice!")
         
         # Performance evaluation
         if inference_time < 3.0:
