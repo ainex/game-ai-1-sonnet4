@@ -36,6 +36,15 @@ A **Windows desktop application that provides AI-powered gaming assistance for T
    pytest tests/ -v
    ```
 
+### Local AI Features
+
+The server includes offline image captioning and text-to-speech services.
+Endpoints:
+
+- `POST /api/v1/image/analyze` - describe uploaded screenshot
+- `POST /api/v1/tts/speak` - synthesize speech from text
+- `POST /api/v1/game/analyze-and-speak` - analyze screenshot and return spoken description
+
 ### Windows 11 Setup Notes
 
 The `setup.sh` script targets Linux environments. On Windows 11:
