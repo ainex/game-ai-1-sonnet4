@@ -7,7 +7,7 @@ class MockOpenAI:
     """Mock OpenAI API client."""
 
     def __init__(self) -> None:
-        """Initialize MockOpenAI."""
+        """Initialize the mock OpenAI client."""
         self.chat = Mock()
         self.chat.completions = Mock()
         self.chat.completions.create = Mock()
@@ -17,7 +17,7 @@ class MockClaude:
     """Mock Claude API client."""
 
     def __init__(self) -> None:
-        """Initialize MockClaude."""
+        """Initialize the mock Claude client."""
         self.messages = Mock()
         self.messages.create = Mock()
 

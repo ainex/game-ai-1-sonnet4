@@ -22,4 +22,4 @@ C4Container
     UpdateRelStyle(client_app, server_app, $textColor="white", $lineColor="gray", $offsetX="-60")
     UpdateRelStyle(server_app, client_app, $textColor="white", $lineColor="gray", $offsetY="-40", $offsetX="-60")
     UpdateRelStyle(server_app, local_llm, $textColor="white", $lineColor="gray", $offsetX="-40")
-``` 
+```
