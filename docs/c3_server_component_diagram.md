@@ -43,4 +43,4 @@ C4Component
 
     UpdateRelStyle(analyze_endpoint, llm_service_interface, $textColor="#6c757d", $lineColor="#6c757d", $lineStyle="dashed")
     UpdateRelStyle(llm_service_interface, local_llm, $textColor="#6c757d", $lineColor="#6c757d", $lineStyle="dashed")
-``` 
+```

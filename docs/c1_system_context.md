@@ -16,4 +16,4 @@ C4Context
     UpdateRelStyle(sims_ai_assistant, sims4, $textColor="white", $lineColor="gray", $offsetX="-40")
     UpdateRelStyle(user, sims4, $textColor="white", $lineColor="gray", $offsetX="0")
     UpdateRelStyle(sims_ai_assistant, local_llm, $textColor="white", $lineColor="gray", $offsetX="-40")
-``` 
+```
