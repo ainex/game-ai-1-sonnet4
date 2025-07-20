@@ -72,7 +72,14 @@ install_system_packages() {
         curl \
         wget \
         unzip \
-        xvfb 2>/dev/null; then
+        xvfb \
+        espeak-ng \
+        espeak-data \
+        libsndfile1-dev \
+        libasound2-plugins \
+        nvidia-cuda-toolkit \
+        libcudnn8 \
+        libcudnn8-dev 2>/dev/null; then
         echo "✅ Remaining system packages installed successfully or already present"
     else
         echo "⚠️  Some remaining system packages failed to install - continuing with Python setup"
@@ -150,14 +157,19 @@ install_python_packages() {
 
     # AI/ML packages (lightweight for Codex development)
     echo "Installing lightweight AI/ML packages for development..."
-    # Install CPU-only PyTorch (much smaller, no CUDA)
-    pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+    # Install CUDA-enabled PyTorch for local GPU usage
+    pip install --no-cache-dir \
+        torch>=2.0.0 torchvision torchaudio \
+        --index-url https://download.pytorch.org/whl/cu118
 
     # Install minimal transformers ecosystem for API development
     pip install --no-cache-dir \
         transformers>=4.35.0 \
+        accelerate>=0.24.0 \
         tokenizers>=0.15.0 \
-        huggingface-hub>=0.19.0
+        huggingface-hub>=0.19.0 \
+        TTS>=0.19.0 \
+        librosa>=0.10.0
 
     # Install basic scientific computing packages
     echo "Installing basic scientific packages..."
@@ -803,6 +815,24 @@ except ImportError as e:
     else
         echo "⚠️  FFmpeg not found (may affect audio processing)"
     fi
+
+    echo "Verifying AI models..."
+    python3 - <<'PY'
+from transformers import pipeline
+from TTS.api import TTS
+
+try:
+    captioner = pipeline('image-to-text', model='nlpconnect/vit-gpt2-image-captioning')
+    print('✅ Image captioning model loaded')
+except Exception as e:
+    print(f'❌ Image captioning error: {e}')
+
+try:
+    tts = TTS(model_name='tts_models/multilingual/multi-dataset/xtts_v2', gpu=True)
+    print('✅ TTS model loaded')
+except Exception as e:
+    print(f'❌ TTS error: {e}')
+PY
 
     echo "✅ Installation verification complete"
 }

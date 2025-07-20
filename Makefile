@@ -23,6 +23,7 @@ help:
 	@echo "  format         - Format code with black and isort"
 	@echo "  typecheck      - Run mypy type checking"
 	@echo "  security       - Run security checks with bandit"
+	@echo "  verify-cuda    - Verify CUDA/GPU setup for TTS acceleration"
 	@echo ""
 	@echo "Server Commands:"
 	@echo "  server         - Start FastAPI development server"
@@ -216,6 +217,11 @@ verify:
 	@pip --version
 	@echo "Critical packages:"
 	@python -c "import fastapi, sqlalchemy, pytest, sounddevice, PIL; print('✅ All critical packages available')"
+
+# CUDA Verification
+verify-cuda:
+	@echo "🎮 Verifying CUDA setup for TTS acceleration..."
+	python scripts/verify_cuda.py
 
 # Development Info
 info:
