@@ -26,10 +26,27 @@ A **Windows desktop application that provides AI-powered gaming assistance for T
    cd server && python -m uvicorn src.main:app --reload --port 8000
    ```
 
-4. **Run the client (when implemented):**
+4. **Run the client:**
    ```bash
    cd client && python src/main.py
    ```
+
+## 🎮 How to Use
+
+### Voice + Screenshot Analysis (Recommended)
+Press **Ctrl+Shift+V** for the complete experience:
+1. 📸 **Automatic screenshot capture** of your game
+2. 🎵 **Pleasant chime sound** indicates recording start
+3. 🎤 **Speak your question** (e.g., "What should I do in this situation?")
+4. 🔇 **Auto-stop** after 2 seconds of silence (no need to hold keys!)
+5. 🎵 **Pleasant chime** confirms recording ended
+6. 🤖 **AI analyzes both** your screenshot and voice
+7. 🔊 **Spoken response** with helpful advice
+
+### Alternative Hotkeys
+- **Ctrl+Shift+S**: Screenshot + AI description (no voice input)
+- **Ctrl+Shift+A**: Screenshot + text analysis only
+- **Ctrl+Shift+T**: Test text-to-speech service
 
 5. **Verify the setup:**
    ```bash
@@ -42,8 +59,10 @@ The server includes offline image captioning and text-to-speech services with GP
 
 **API Endpoints:**
 - `POST /api/v1/image/analyze` - describe uploaded screenshot
+- `POST /api/v1/stt/transcribe` - transcribe audio to text
 - `POST /api/v1/tts/speak` - synthesize speech from text
 - `POST /api/v1/game/analyze-and-speak` - analyze screenshot and return spoken description
+- `POST /api/v1/game/analyze-image-and-voice` - **NEW!** analyze both screenshot + voice and return intelligent response
 
 **GPU Acceleration:**
 - Supports NVIDIA RTX/GTX graphics cards
@@ -114,7 +133,9 @@ game-ai-1-sonnet4/
 ## 🎮 Key Features
 
 ### Voice Processing
-- Real-time voice recording and transcription
+- **NEW!** Real-time voice recording with pleasant audio feedback (like Alexa)
+- **NEW!** Automatic silence detection (no push-to-talk required)
+- **NEW!** Local speech-to-text using Whisper AI
 - Natural language processing for game commands
 - Voice-activated assistance during gameplay
 

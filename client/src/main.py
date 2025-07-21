@@ -2,10 +2,19 @@ import io
 import tempfile
 import os
 import logging
+import time
+import sys
 
 import keyboard
 import requests
 from PIL import ImageGrab
+
+# Add the current directory to path for imports
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
+from core.voice_recorder import get_voice_recorder
 
 # Set up logging for Windows compatibility
 import sys
@@ -221,6 +230,109 @@ def capture_and_analyze_text_only() -> None:
         logger.error(f"❌ Unexpected error: {exc}")
 
 
+def capture_screenshot_and_record_voice() -> None:
+    """Capture screenshot AND record voice, then send both to server for analysis."""
+    logger.info("🎮 Starting combined screenshot + voice capture...")
+    
+    try:
+        # Get voice recorder
+        recorder = get_voice_recorder()
+        
+        # Step 1: Capture screenshot
+        logger.info("📸 Capturing screenshot...")
+        screenshot = ImageGrab.grab()
+        logger.info(f"📸 Screenshot captured: {screenshot.size} pixels")
+        
+        # Save screenshot to buffer
+        screenshot_buffer = io.BytesIO()
+        screenshot.save(screenshot_buffer, format="PNG")
+        screenshot_buffer.seek(0)
+        screenshot_size = len(screenshot_buffer.getvalue())
+        logger.info(f"📸 Screenshot saved to buffer: {screenshot_size} bytes")
+        
+        # Step 2: Start voice recording
+        logger.info("🎤 Starting voice recording (speak after the chime, it will auto-stop when you're done)...")
+        print("🎤 Recording started! Speak after the chime. Recording will auto-stop after silence.")
+        
+        recording_success = recorder.start_recording()
+        if not recording_success:
+            logger.error("❌ Failed to start voice recording")
+            print("❌ Voice recording failed. Using screenshot only.")
+            # Fall back to screenshot-only mode
+            capture_and_analyze_with_speech()
+            return
+        
+        # Wait for recording to complete (it will auto-stop on silence)
+        print("🎤 Recording... (will auto-stop after 2 seconds of silence)")
+        while recorder.is_recording_active():
+            time.sleep(0.1)
+        
+        # Get recorded audio
+        audio_bytes = recorder.stop_recording()
+        if audio_bytes is None:
+            logger.warning("⚠️ No audio recorded, using screenshot only")
+            print("⚠️ No voice recorded. Using screenshot only.")
+            # Fall back to screenshot-only mode
+            capture_and_analyze_with_speech()
+            return
+        
+        logger.info(f"🎵 Voice recorded: {len(audio_bytes)} bytes")
+        print(f"✅ Voice recording completed: {len(audio_bytes)} bytes")
+        
+        # Step 3: Send both to server
+        logger.info("🔍 Sending screenshot + voice to server for combined analysis...")
+        print("🔍 Analyzing screenshot and voice...")
+        
+        # Prepare files for upload
+        screenshot_buffer.seek(0)
+        files = {
+            "image": ("screenshot.png", screenshot_buffer, "image/png"),
+            "audio": ("voice.wav", io.BytesIO(audio_bytes), "audio/wav")
+        }
+        
+        response = requests.post(
+            "http://localhost:8000/api/v1/game/analyze-image-and-voice",
+            files=files,
+            timeout=60,  # Longer timeout for combined processing
+        )
+        
+        logger.info(f"📡 Server response status: {response.status_code}")
+        logger.info(f"📡 Server response headers: {dict(response.headers)}")
+        logger.info(f"📡 Response content length: {len(response.content)} bytes")
+        
+        if response.status_code == 200:
+            logger.info("✅ Combined analysis complete! Processing audio response...")
+            print("✅ Analysis complete! Playing AI response...")
+            
+            # Save and play the audio response
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_file:
+                tmp_file.write(response.content)
+                audio_path = tmp_file.name
+            
+            logger.info(f"💾 Response audio saved to temporary file: {audio_path}")
+            
+            # Use our improved audio playback function
+            play_audio(audio_path)
+            
+            # Clean up temporary file
+            try:
+                os.unlink(audio_path)
+                logger.info("🧹 Temporary audio file cleaned up")
+            except Exception as e:
+                logger.warning(f"⚠️ Failed to clean up temporary file: {e}")
+        else:
+            logger.error(f"❌ Request failed with status {response.status_code}")
+            logger.error(f"❌ Response text: {response.text}")
+            print(f"❌ Analysis failed: {response.status_code}")
+            
+    except requests.RequestException as exc:
+        logger.error(f"❌ Request failed: {exc}")
+        print(f"❌ Connection failed: {exc}")
+    except Exception as exc:
+        logger.error(f"❌ Unexpected error: {exc}")
+        print(f"❌ Error: {exc}")
+
+
 def test_tts_service() -> None:
     """Test the TTS service with a sample text."""
     test_text = "Hello! This is a test of the text-to-speech service."
@@ -271,16 +383,21 @@ def main() -> None:
     logger.info("🎮 Sims 4 AI Gaming Assistant Client Starting...")
     print("🎮 Sims 4 AI Gaming Assistant Client")
     print("📋 Available hotkeys:")
-    print("  Ctrl+Shift+S: Capture screenshot + AI analysis + speech")
-    print("  Ctrl+Shift+A: Capture screenshot + text analysis only")
-    print("  Ctrl+Shift+T: Test TTS service")
+    print("  Ctrl+Shift+V: 🎤📸 NEW! Capture screenshot + record voice (with pleasant chimes)")
+    print("  Ctrl+Shift+S: 📸🔊 Capture screenshot + AI analysis + speech")
+    print("  Ctrl+Shift+A: 📸📝 Capture screenshot + text analysis only")
+    print("  Ctrl+Shift+T: 🔊🧪 Test TTS service")
     print("  Esc: Quit")
+    print()
+    print("🎯 RECOMMENDED: Use Ctrl+Shift+V for the complete voice + screenshot experience!")
+    print("🎤 Voice recording will auto-stop after 2 seconds of silence (no need to hold button)")
     print()
     
     # Register hotkeys for new functionality
-    keyboard.add_hotkey("ctrl+shift+s", capture_and_analyze_with_speech)
-    keyboard.add_hotkey("ctrl+shift+a", capture_and_analyze_text_only)
-    keyboard.add_hotkey("ctrl+shift+t", test_tts_service)
+    keyboard.add_hotkey("ctrl+shift+v", capture_screenshot_and_record_voice)  # NEW combined function
+    keyboard.add_hotkey("ctrl+shift+s", capture_and_analyze_with_speech)      # Existing screenshot + TTS
+    keyboard.add_hotkey("ctrl+shift+a", capture_and_analyze_text_only)        # Existing screenshot only
+    keyboard.add_hotkey("ctrl+shift+t", test_tts_service)                     # Existing TTS test
     
     logger.info("✅ Client ready! Use the hotkeys above or press Esc to quit.")
     print("✅ Client ready! Use the hotkeys above or press Esc to quit.")
