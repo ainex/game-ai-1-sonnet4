@@ -231,8 +231,8 @@ def capture_and_analyze_text_only() -> None:
 
 
 def capture_screenshot_and_record_voice() -> None:
-    """Capture screenshot AND record voice, then send both to server for analysis."""
-    logger.info("🎮 Starting combined screenshot + voice capture...")
+    """Capture screenshot AND record voice, then send both to OpenAI for analysis."""
+    logger.info("🎮 Starting OpenAI-powered screenshot + voice capture...")
     
     try:
         # Get voice recorder
@@ -279,21 +279,25 @@ def capture_screenshot_and_record_voice() -> None:
         logger.info(f"🎵 Voice recorded: {len(audio_bytes)} bytes")
         print(f"✅ Voice recording completed: {len(audio_bytes)} bytes")
         
-        # Step 3: Send both to server
-        logger.info("🔍 Sending screenshot + voice to server for combined analysis...")
-        print("🔍 Analyzing screenshot and voice...")
+        # Step 3: Send both to OpenAI server
+        logger.info("🤖 Sending screenshot + voice to OpenAI for analysis...")
+        print("🤖 Analyzing screenshot and voice with OpenAI...")
         
-        # Prepare files for upload
+        # Prepare files for upload with system prompt
         screenshot_buffer.seek(0)
         files = {
             "image": ("screenshot.png", screenshot_buffer, "image/png"),
             "audio": ("voice.wav", io.BytesIO(audio_bytes), "audio/wav")
         }
+        data = {
+            "system_prompt": "You are a helpful game assistant. Analyze the screenshot and answer the user's question about the game situation. Provide specific, actionable advice for the player."
+        }
         
         response = requests.post(
-            "http://localhost:8000/api/v1/game/analyze-image-and-voice",
+            "http://localhost:8000/api/v1/openai/analyze-game-with-voice",
             files=files,
-            timeout=60,  # Longer timeout for combined processing
+            data=data,
+            timeout=120,  # Longer timeout for OpenAI processing
         )
         
         logger.info(f"📡 Server response status: {response.status_code}")

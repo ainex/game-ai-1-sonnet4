@@ -59,7 +59,10 @@ class VoiceRecorder:
         self.is_recording = False
         self.audio_data = []
         self.recording_thread: Optional[threading.Thread] = None
+        self.monitoring_thread: Optional[threading.Thread] = None
         self.stop_event = threading.Event()
+        self.stream = None
+        self.last_audio_bytes: Optional[bytes] = None  # <-- Store last audio
         
         # Generate pleasant audio feedback sounds
         self._generate_feedback_sounds()
@@ -121,6 +124,7 @@ class VoiceRecorder:
             else:
                 audio_chunk = indata[:, 0]
             
+            # Make a copy to avoid reference issues
             self.audio_data.append(audio_chunk.copy())
     
     def _monitor_silence(self):
@@ -189,6 +193,7 @@ class VoiceRecorder:
             # Reset recording state
             self.is_recording = True
             self.audio_data = []
+            self.last_audio_bytes = None  # <-- Reset last audio
             self.stop_event.clear()
             self.recording_start_time = time.time()
             
@@ -215,31 +220,47 @@ class VoiceRecorder:
     
     def stop_recording(self) -> Optional[bytes]:
         """Stop recording and return audio data as WAV bytes."""
-        if not self.is_recording:
+        if not self.is_recording and len(self.audio_data) == 0:
+            # If we have a last recording, return it
+            if self.last_audio_bytes is not None:
+                logger.info("🔁 Returning last recorded audio bytes")
+                return self.last_audio_bytes
             logger.warning("⚠️ No recording in progress")
             return None
         
         try:
-            logger.info("🛑 Stopping voice recording...")
-            
-            # Signal stop
-            self.is_recording = False
-            self.stop_event.set()
-            
-            # Stop recording stream
-            if hasattr(self, 'stream'):
-                self.stream.stop()
-                self.stream.close()
-            
-            # Play stop sound
-            self._play_feedback_sound(self.stop_sound)
-            
-            # Wait for monitoring thread to finish
-            if hasattr(self, 'monitoring_thread'):
-                self.monitoring_thread.join(timeout=1.0)
+            # Only stop if we're actually recording
+            if self.is_recording:
+                logger.info("🛑 Stopping voice recording...")
+                
+                # Signal stop
+                self.is_recording = False
+                self.stop_event.set()
+                
+                # Stop recording stream
+                if self.stream is not None:
+                    self.stream.stop()
+                    self.stream.close()
+                    self.stream = None
+                
+                # Play stop sound
+                self._play_feedback_sound(self.stop_sound)
+                
+                # Wait for monitoring thread to finish (with timeout and proper thread check)
+                if self.monitoring_thread is not None and self.monitoring_thread.is_alive():
+                    # Check if we're not trying to join the current thread
+                    if self.monitoring_thread != threading.current_thread():
+                        self.monitoring_thread.join(timeout=1.0)
+                    else:
+                        logger.warning("⚠️ Skipping thread join - monitoring thread is current thread")
+            else:
+                logger.info("🛑 Recording already stopped, processing audio data...")
             
             # Process recorded audio
             if len(self.audio_data) == 0:
+                if self.last_audio_bytes is not None:
+                    logger.info("🔁 Returning last recorded audio bytes")
+                    return self.last_audio_bytes
                 logger.warning("⚠️ No audio data recorded")
                 return None
             
@@ -252,6 +273,10 @@ class VoiceRecorder:
             sf.write(buffer, full_audio, self.sample_rate, format='WAV')
             buffer.seek(0)
             audio_bytes = buffer.getvalue()
+            
+            # Clear audio data after processing
+            self.audio_data = []
+            self.last_audio_bytes = audio_bytes  # <-- Store last audio
             
             logger.info(f"✅ Voice recording completed: {len(audio_bytes)} bytes")
             return audio_bytes

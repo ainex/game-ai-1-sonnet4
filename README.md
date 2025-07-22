@@ -33,14 +33,14 @@ A **Windows desktop application that provides AI-powered gaming assistance for T
 
 ## 🎮 How to Use
 
-### Voice + Screenshot Analysis (Recommended)
+### Voice + Screenshot Analysis with OpenAI (Recommended)
 Press **Ctrl+Shift+V** for the complete experience:
 1. 📸 **Automatic screenshot capture** of your game
 2. 🎵 **Pleasant chime sound** indicates recording start
 3. 🎤 **Speak your question** (e.g., "What should I do in this situation?")
 4. 🔇 **Auto-stop** after 2 seconds of silence (no need to hold keys!)
 5. 🎵 **Pleasant chime** confirms recording ended
-6. 🤖 **AI analyzes both** your screenshot and voice
+6. 🤖 **OpenAI analyzes both** your screenshot and voice using GPT-4 Vision
 7. 🔊 **Spoken response** with helpful advice
 
 ### Alternative Hotkeys
@@ -62,7 +62,9 @@ The server includes offline image captioning and text-to-speech services with GP
 - `POST /api/v1/stt/transcribe` - transcribe audio to text
 - `POST /api/v1/tts/speak` - synthesize speech from text
 - `POST /api/v1/game/analyze-and-speak` - analyze screenshot and return spoken description
-- `POST /api/v1/game/analyze-image-and-voice` - **NEW!** analyze both screenshot + voice and return intelligent response
+- `POST /api/v1/game/analyze-image-and-voice` - analyze both screenshot + voice and return intelligent response
+- `POST /api/v1/openai/analyze-game-with-voice` - **NEW!** OpenAI-powered analysis with GPT-4 Vision + Whisper
+- `POST /api/v1/openai/analyze-game-text-only` - **NEW!** OpenAI-powered analysis with text input
 
 **GPU Acceleration:**
 - Supports NVIDIA RTX/GTX graphics cards
@@ -145,6 +147,9 @@ game-ai-1-sonnet4/
 - Context-aware gameplay suggestions
 
 ### LLM Integration
+- **OpenAI GPT-4 Vision** for screenshot analysis and question answering
+- **OpenAI Whisper** for high-quality audio transcription
+- **Customizable system prompts** for different game scenarios
 - Multiple LLM provider support (OpenAI, Claude)
 - Intelligent gameplay advice and strategies
 - Character development recommendations
@@ -236,7 +241,7 @@ DEBUG=true
 ENVIRONMENT=development
 
 # API Keys (use mocks in development)
-OPENAI_API_KEY=mock_key_for_testing
+OPENAI_API_KEY=your_actual_openai_api_key_here
 CLAUDE_API_KEY=mock_key_for_testing
 
 # Database
@@ -280,10 +285,19 @@ The Codex agent will automatically read the `AGENTS.md` file and use the setup s
 
 ## 🎯 Next Steps
 
-1. Review the [`AGENTS.md`](AGENTS.md) file to understand the development workflow
-2. Run `./setup.sh` to prepare your development environment
-3. Create your first `IMPLEMENTATION_PLAN.md` for new features
-4. Start building the Sims 4 AI assistant with voice and visual capabilities!
+1. **Set up OpenAI API Key**: Add your OpenAI API key to the environment variables
+2. **Install OpenAI dependency**: Run `pip install openai>=1.0.0`
+3. **Test the integration**: Run `python test_openai_integration.py`
+4. **Start using**: Press **Ctrl+Shift+V** for OpenAI-powered game assistance!
+
+### OpenAI Setup
+```bash
+# Add your OpenAI API key to environment
+export OPENAI_API_KEY="your_actual_openai_api_key_here"
+
+# Or create a .env file
+echo "OPENAI_API_KEY=your_actual_openai_api_key_here" > .env
+```
 
 ## 🔒 Security & Privacy
 

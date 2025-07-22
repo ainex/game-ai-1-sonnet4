@@ -1,200 +1,148 @@
 #!/usr/bin/env python3
-"""Test script for voice recording and STT functionality."""
+"""Test script for voice recording functionality."""
 
-import requests
+import sys
+import os
 import time
-import io
-from PIL import Image, ImageDraw, ImageFont
+import logging
 
-def create_test_image():
-    """Create a simple test image for testing."""
-    # Create a test image
-    img = Image.new('RGB', (800, 600))
-    img.paste((173, 216, 230), [0, 0, 800, 600])  # lightblue background
-    draw = ImageDraw.Draw(img)
-    
-    # Draw some test content
-    draw.rectangle([50, 50, 750, 550], fill='white', outline='black', width=3)
-    draw.text((100, 100), "TEST SCREENSHOT", fill='black')
-    draw.text((100, 150), "This is a test image for", fill='black')
-    draw.text((100, 200), "the AI gaming assistant", fill='black')
-    draw.ellipse([350, 300, 450, 400], fill='red', outline='darkred', width=3)  # circle using ellipse
-    draw.text((350, 450), "Test Element", fill='black')
-    
-    # Save to buffer
-    buffer = io.BytesIO()
-    img.save(buffer, format='PNG')
-    buffer.seek(0)
-    return buffer
+# Add the client directory to the path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+client_dir = os.path.join(current_dir, 'client', 'src')
+if client_dir not in sys.path:
+    sys.path.insert(0, client_dir)
 
-def test_server_health():
-    """Test if server is running."""
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+def test_audio_devices():
+    """Test audio device availability."""
+    logger.info("🔍 Testing audio device availability...")
+    
     try:
-        response = requests.get("http://localhost:8000/docs", timeout=5)
-        if response.status_code == 200:
-            print("✅ Server is running")
-            return True
-        else:
-            print(f"❌ Server returned status {response.status_code}")
-            return False
-    except requests.RequestException as e:
-        print(f"❌ Server is not accessible: {e}")
+        import sounddevice as sd
+        logger.info("✅ Sounddevice imported successfully")
+        
+        # List available devices
+        devices = sd.query_devices()
+        logger.info(f"📊 Found {len(devices)} audio devices:")
+        
+        for i, device in enumerate(devices):
+            # Handle different device structures
+            name = device.get('name', 'Unknown')
+            max_inputs = device.get('max_inputs', 0)
+            max_outputs = device.get('max_outputs', 0)
+            logger.info(f"  Device {i}: {name} (inputs: {max_inputs}, outputs: {max_outputs})")
+        
+        # Get default devices
+        try:
+            default_input = sd.query_devices(kind='input')
+            logger.info(f"🎤 Default input device: {default_input.get('name', 'Unknown')}")
+        except Exception as e:
+            logger.warning(f"⚠️ Could not get default input device: {e}")
+        
+        try:
+            default_output = sd.query_devices(kind='output')
+            logger.info(f"🔊 Default output device: {default_output.get('name', 'Unknown')}")
+        except Exception as e:
+            logger.warning(f"⚠️ Could not get default output device: {e}")
+        
+        return True
+        
+    except ImportError as e:
+        logger.error(f"❌ Sounddevice not available: {e}")
         return False
-
-def test_image_analysis():
-    """Test image analysis endpoint."""
-    print("\n🧪 Testing image analysis...")
-    
-    try:
-        test_image = create_test_image()
-        files = {"image": ("test.png", test_image, "image/png")}
-        
-        response = requests.post(
-            "http://localhost:8000/api/v1/image/analyze",
-            files=files,
-            timeout=30
-        )
-        
-        if response.status_code == 200:
-            result = response.json()
-            description = result.get('description', 'No description')
-            print(f"✅ Image analysis works: '{description}'")
-            return True
-        else:
-            print(f"❌ Image analysis failed: {response.status_code}")
-            print(f"Response: {response.text}")
-            return False
-            
     except Exception as e:
-        print(f"❌ Image analysis error: {e}")
-        return False
-
-def test_stt_service():
-    """Test STT service availability."""
-    print("\n🧪 Testing STT service availability...")
-    
-    try:
-        response = requests.get(
-            "http://localhost:8000/api/v1/stt/test",
-            timeout=10
-        )
-        
-        if response.status_code == 200:
-            result = response.json()
-            status = result.get('status', 'unknown')
-            message = result.get('message', 'No message')
-            
-            if status == 'available':
-                print(f"✅ STT service is ready: {message}")
-                return True
-            else:
-                print(f"⚠️ STT service status: {status} - {message}")
-                return False
-        else:
-            print(f"❌ STT test failed: {response.status_code}")
-            return False
-            
-    except Exception as e:
-        print(f"❌ STT test error: {e}")
-        return False
-
-def test_tts_service():
-    """Test TTS service."""
-    print("\n🧪 Testing TTS service...")
-    
-    try:
-        response = requests.post(
-            "http://localhost:8000/api/v1/tts/speak",
-            json={"text": "Hello! This is a test of the text to speech service.", "language": "en"},
-            timeout=30
-        )
-        
-        if response.status_code == 200:
-            print(f"✅ TTS service works: {len(response.content)} bytes of audio generated")
-            return True
-        else:
-            print(f"❌ TTS service failed: {response.status_code}")
-            print(f"Response: {response.text}")
-            return False
-            
-    except Exception as e:
-        print(f"❌ TTS service error: {e}")
+        logger.error(f"❌ Error testing audio devices: {e}")
         return False
 
 def test_voice_recorder():
-    """Test the voice recorder module."""
-    print("\n🧪 Testing voice recorder...")
+    """Test the voice recorder functionality."""
+    logger.info("🎤 Testing voice recorder...")
     
     try:
-        # Import the voice recorder
-        import sys
-        import os
-        client_src_path = os.path.join(os.path.dirname(__file__), 'client', 'src')
-        if client_src_path not in sys.path:
-            sys.path.append(client_src_path)
-        
-        # Try to import with exception handling
-        try:
-            from core.voice_recorder import get_voice_recorder  # type: ignore
-        except ImportError as ie:
-            print(f"⚠️ Could not import voice recorder module: {ie}")
-            print("This is expected if running from a different location.")
-            return False
+        from core.voice_recorder import get_voice_recorder
         
         recorder = get_voice_recorder()
-        print("✅ Voice recorder module imported successfully")
+        logger.info("✅ Voice recorder created successfully")
         
-        # Test recorder initialization
-        if hasattr(recorder, 'start_recording') and hasattr(recorder, 'stop_recording'):
-            print("✅ Voice recorder has required methods")
-            return True
-        else:
-            print("❌ Voice recorder missing required methods")
+        # Test recording start
+        logger.info("🎤 Starting test recording (speak for a few seconds)...")
+        success = recorder.start_recording()
+        
+        if not success:
+            logger.error("❌ Failed to start recording")
             return False
-            
+        
+        logger.info("✅ Recording started successfully")
+        logger.info("🎤 Please speak for a few seconds...")
+        
+        # Wait for recording to complete
+        start_time = time.time()
+        while recorder.is_recording_active():
+            time.sleep(0.1)
+            if time.time() - start_time > 30:  # Max 30 seconds
+                logger.warning("⏰ Recording timeout, stopping manually")
+                # Only call stop_recording if still active
+                audio_bytes = recorder.stop_recording()
+                break
+        else:
+            # Recording stopped naturally, get the audio
+            audio_bytes = recorder.stop_recording()
+        
+        if audio_bytes is None:
+            logger.error("❌ No audio recorded")
+            return False
+        
+        logger.info(f"✅ Recording completed: {len(audio_bytes)} bytes")
+        
+        # Save audio to file for inspection
+        test_file = "test_recording.wav"
+        with open(test_file, "wb") as f:
+            f.write(audio_bytes)
+        
+        logger.info(f"💾 Test recording saved to: {test_file}")
+        return True
+        
     except Exception as e:
-        print(f"❌ Voice recorder test error: {e}")
+        logger.error(f"❌ Error testing voice recorder: {e}")
         return False
 
 def main():
-    """Run all tests."""
-    print("🧪 Testing Voice + Screenshot Functionality")
-    print("=" * 50)
+    """Main test function."""
+    logger.info("🧪 Starting voice functionality tests...")
     
-    tests = [
-        ("Server Health", test_server_health),
-        ("Image Analysis", test_image_analysis),
-        ("STT Service", test_stt_service),
-        ("TTS Service", test_tts_service),
-        ("Voice Recorder", test_voice_recorder),
-    ]
+    # Test 1: Audio devices
+    logger.info("\n" + "="*50)
+    logger.info("TEST 1: Audio Device Detection")
+    logger.info("="*50)
+    audio_ok = test_audio_devices()
     
-    passed = 0
-    total = len(tests)
+    if not audio_ok:
+        logger.error("❌ Audio device test failed - cannot proceed with recording test")
+        return
     
-    for test_name, test_func in tests:
-        print(f"\n📋 Running {test_name} test...")
-        try:
-            if test_func():
-                passed += 1
-        except Exception as e:
-            print(f"❌ {test_name} test crashed: {e}")
+    # Test 2: Voice recorder
+    logger.info("\n" + "="*50)
+    logger.info("TEST 2: Voice Recording")
+    logger.info("="*50)
+    recording_ok = test_voice_recorder()
     
-    print("\n" + "=" * 50)
-    print(f"📊 Test Results: {passed}/{total} tests passed")
+    # Summary
+    logger.info("\n" + "="*50)
+    logger.info("TEST SUMMARY")
+    logger.info("="*50)
+    logger.info(f"Audio devices: {'✅ PASS' if audio_ok else '❌ FAIL'}")
+    logger.info(f"Voice recording: {'✅ PASS' if recording_ok else '❌ FAIL'}")
     
-    if passed == total:
-        print("🎉 All tests passed! The voice + screenshot functionality should work.")
-        print("\n🎯 Next steps:")
-        print("1. Start the server: cd server && python -m uvicorn src.main:app --reload")
-        print("2. Start the client: cd client && python src/main.py")
-        print("3. Press Ctrl+Shift+V to test the complete workflow!")
+    if audio_ok and recording_ok:
+        logger.info("🎉 All tests passed! Voice functionality should work.")
     else:
-        print("⚠️ Some tests failed. Check the error messages above.")
-        print("\n🔧 Troubleshooting:")
-        print("- Make sure the server is running")
-        print("- Check that all dependencies are installed")
-        print("- Verify your microphone is working")
+        logger.error("❌ Some tests failed. Check the logs above for details.")
 
 if __name__ == "__main__":
     main() 
