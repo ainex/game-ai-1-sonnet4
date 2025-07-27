@@ -1,11 +1,11 @@
-# Sims 4 AI Gaming Assistant - Development Makefile
+# AI Gaming Assistant - Development Makefile
 # Provides convenient commands for common development tasks
 
 .PHONY: help setup validate clean test lint format docs install dev-install
 
 # Default target
 help:
-	@echo "🎮 Sims 4 AI Gaming Assistant - Development Commands"
+	@echo "🎮 AI Gaming Assistant - Development Commands"
 	@echo "================================================="
 	@echo ""
 	@echo "Setup Commands:"
@@ -157,7 +157,7 @@ db-migrate:
 
 db-reset:
 	@echo "🗄️ Resetting database..."
-	rm -f server/sims4_assistant.db
+	rm -f server/game_assistant.db
 	$(MAKE) db-create
 
 # Cleanup Commands
@@ -225,7 +225,7 @@ verify-cuda:
 
 # Development Info
 info:
-	@echo "📋 Sims 4 AI Assistant Development Environment Info:"
+	@echo "📋 AI Gaming Assistant Development Environment Info:"
 	@echo "=================================================="
 	@echo "Python: $(shell python --version 2>&1)"
 	@echo "Pip: $(shell pip --version 2>&1)"
@@ -243,7 +243,7 @@ plan:
 	echo "" >> IMPLEMENTATION_PLAN.md; \
 	echo "## General Solution (sd)" >> IMPLEMENTATION_PLAN.md; \
 	echo "" >> IMPLEMENTATION_PLAN.md; \
-	echo "Describe the general solution approach for $$feature_name in the Sims 4 AI Assistant." >> IMPLEMENTATION_PLAN.md; \
+	echo "Describe the general solution approach for $$feature_name in the AI Gaming Assistant." >> IMPLEMENTATION_PLAN.md; \
 	echo "" >> IMPLEMENTATION_PLAN.md; \
 	echo "## Dependencies and Dependants Investigation" >> IMPLEMENTATION_PLAN.md; \
 	echo "" >> IMPLEMENTATION_PLAN.md; \

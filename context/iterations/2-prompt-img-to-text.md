@@ -1,8 +1,8 @@
 ## General Solution Description (sd)
 
-This implementation adds **local AI capabilities** to the Sims 4 AI Gaming Assistant:
+This implementation adds **local AI capabilities** to the AI Gaming Assistant:
 
-1. **Local Image Recognition**: Use `nlpconnect/vit-gpt2-image-captioning` to analyze screenshots and generate descriptive text about The Sims 4 game state
+1. **Local Image Recognition**: Use `nlpconnect/vit-gpt2-image-captioning` to analyze screenshots and generate descriptive text about the game state
 2. **Local Text-to-Speech**: Use `XTTS-v2` (Coqui TTS) to read image analysis results aloud to the user
 3. **Server-side Processing**: Both models run on the FastAPI server to utilize the 4070S GPU (12GB VRAM)
 4. **Client Trigger**: Simple client-side buttons to capture screenshots and request TTS playback
@@ -12,7 +12,7 @@ This implementation adds **local AI capabilities** to the Sims 4 AI Gaming Assis
 - **Fully Offline**: No internet required for core AI functionality
 - **GPU Optimized**: Leverages 4070S with 12GB VRAM efficiently
 - **Multilingual TTS**: Support for English, Russian, German via XTTS-v2
-- **Game-Aware**: Image captioning specifically for Sims 4 UI and gameplay elements
+- **Game-Aware**: Image captioning specifically for game UI and gameplay elements
 
 ## Dependencies and Dependants Investigation
 

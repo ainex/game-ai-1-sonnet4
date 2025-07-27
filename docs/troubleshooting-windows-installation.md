@@ -1,6 +1,6 @@
 # Windows Installation Troubleshooting Guide
 
-This guide helps resolve common Windows-specific installation issues for the Sims 4 AI Gaming Assistant, particularly TTS library compilation problems.
+This guide helps resolve common Windows-specific installation issues for the AI Gaming Assistant, particularly TTS library compilation problems.
 
 ## Common Error: "Microsoft Visual C++ 14.0 or greater is required"
 
@@ -56,8 +56,8 @@ If pip continues to fail, use Conda instead:
 # Install Miniconda first: https://docs.conda.io/en/latest/miniconda.html
 
 # Create environment with conda
-conda create -n sims4-ai python=3.11
-conda activate sims4-ai
+conda create -n game-ai python=3.11
+conda activate game-ai
 
 # Install TTS via conda-forge
 conda install -c conda-forge coqui-tts
@@ -73,8 +73,8 @@ For persistent issues, use Docker:
 ```powershell
 # Create Dockerfile
 # See: Docker setup section below
-docker build -t sims4-ai .
-docker run -it --gpus all sims4-ai
+docker build -t game-ai .
+docker run -it --gpus all game-ai
 ```
 
 ## Other Common Windows Issues
@@ -199,8 +199,8 @@ CMD ["python", "-m", "uvicorn", "server.src.main:app", "--host", "0.0.0.0", "--p
 
 Build and run:
 ```powershell
-docker build -t sims4-ai .
-docker run -p 8000:8000 sims4-ai
+docker build -t game-ai .
+docker run -p 8000:8000 game-ai
 ```
 
 ## Verification Commands

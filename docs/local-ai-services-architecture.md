@@ -2,7 +2,7 @@
 
 ## Overview
 
-This diagram illustrates the integration of local Text-to-Speech (TTS) and Image Recognition services into the Sims 4 AI Gaming Assistant. The integration was implemented on branch `codex/integrate-local-tts-and-image-recognition` to provide offline AI capabilities.
+This diagram illustrates the integration of local Text-to-Speech (TTS) and Image Recognition services into the AI Gaming Assistant. The integration was implemented on branch `codex/integrate-local-tts-and-image-recognition` to provide offline AI capabilities.
 
 ## Architecture Diagram
 

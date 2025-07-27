@@ -1,21 +1,21 @@
-# 🎮 Sims 4 AI Gaming Assistant - Codex Ready!
+# 🎮 AI Gaming Assistant - Codex Ready!
 
 ## ✅ Repository Successfully Prepared for OpenAI Codex
 
-Your **Sims 4 AI Gaming Assistant** repository has been successfully updated and prepared for OpenAI Codex agent work. All files have been aligned with the actual project requirements from the detailed Codex preparation plan.
+Your **AI Gaming Assistant** repository has been successfully updated and prepared for OpenAI Codex agent work. All files have been aligned with the actual project requirements from the detailed Codex preparation plan.
 
 ## 🔄 What Was Updated
 
 ### Project Focus Correction
 - **Before**: Generic "Game AI Assistant"
-- **After**: **Sims 4 AI Gaming Assistant** with client-server architecture
+- **After**: **AI Gaming Assistant** with client-server architecture
 - **Architecture**: Windows desktop app with FastAPI backend
 - **Features**: Voice recording, screenshot capture, LLM integration
 
 ### Key Files Updated
 
 #### 1. AGENTS.md - Complete Rewrite ✅
-- **Sims 4 specific context** and gaming assistance focus
+- **Game-specific context** and gaming assistance focus
 - **Client-server architecture** guidelines
 - **Voice recording and screenshot capture** requirements
 - **LLM integration strategy** (OpenAI, Claude)
@@ -27,10 +27,10 @@ Your **Sims 4 AI Gaming Assistant** repository has been successfully updated and
 - **System package installation** with graceful failure handling
 - **Audio/visual dependencies** (portaudio, ffmpeg, etc.)
 - **Client-server project structure** creation
-- **Sims 4 specific environment** variables
+- **Game-specific environment** variables
 
 #### 3. README.md - Complete Overhaul ✅
-- **Sims 4 AI Assistant** project description
+- **AI Gaming Assistant** project description
 - **Client-server architecture** overview
 - **Voice processing, screenshot analysis, LLM integration** features
 - **Gaming-specific workflow** and commands
@@ -42,7 +42,7 @@ Your **Sims 4 AI Gaming Assistant** repository has been successfully updated and
 - **Database management** (make db-create, make db-reset)
 - **Gaming-specific validation** commands
 
-#### 5. validate_setup.sh - Sims 4 Focused ✅
+#### 5. validate_setup.sh - Game Focused ✅
 - **Client-server structure** validation
 - **Audio system** availability checks
 - **Screenshot system** testing
@@ -116,7 +116,7 @@ game-ai-1-sonnet4/
 
 ### Immediate Next Steps for Codex Agent:
 
-1. **Read AGENTS.md** - Complete Sims 4 AI Assistant context
+1. **Read AGENTS.md** - Complete AI Gaming Assistant context
 2. **Run setup.sh** - Install any missing system dependencies
 3. **Activate environment**: `source venv/bin/activate`
 4. **Start server**: `make server`
@@ -124,7 +124,7 @@ game-ai-1-sonnet4/
 
 ### Key Codex Features Ready:
 
-- ✅ **Comprehensive AGENTS.md** with Sims 4 gaming context
+- ✅ **Comprehensive AGENTS.md** with gaming context
 - ✅ **Client-server architecture** separation
 - ✅ **Voice recording and screenshot** processing framework
 - ✅ **LLM integration** strategy (fully mocked for offline work)
@@ -153,7 +153,7 @@ make plan               # Create IMPLEMENTATION_PLAN.md
 make clean-plan         # Remove implementation plan
 ```
 
-## 🎮 Sims 4 Gaming Features Ready
+## 🎮 Gaming Features Ready
 
 - **Voice Processing**: Real-time audio capture and transcription
 - **Screenshot Analysis**: Game screen capture and AI analysis
@@ -165,6 +165,6 @@ make clean-plan         # Remove implementation plan
 
 ## 🎉 Success!
 
-The repository is now **100% ready** for productive OpenAI Codex work on the **Sims 4 AI Gaming Assistant** project. The Codex agent will have complete context, proper tooling, and a clear development workflow to build an AI-powered gaming assistant for The Sims 4.
+The repository is now **100% ready** for productive OpenAI Codex work on the **AI Gaming Assistant** project. The Codex agent will have complete context, proper tooling, and a clear development workflow to build an AI-powered gaming assistant for strategy and RPG games.
 
 *Generated: $(date)*

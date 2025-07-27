@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Sims 4 AI Gaming Assistant - PRODUCTION Environment Setup Script
+# AI Gaming Assistant - PRODUCTION Environment Setup Script
 # This script sets up the FULL production environment with heavy AI models
 # Use this for actual deployment on Windows or production Linux servers
 
 set -e  # Exit on any error
 
-echo "🚀 Setting up Sims 4 AI Gaming Assistant PRODUCTION environment..."
+echo "🚀 Setting up AI Gaming Assistant PRODUCTION environment..."
 
 # Install heavy AI dependencies
 install_production_ai() {

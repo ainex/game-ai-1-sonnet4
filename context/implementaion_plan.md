@@ -1,8 +1,8 @@
-# Implementation Plan: Game AI Assistant for Sims 4
+# Implementation Plan: Game AI Assistant
 
 ## Executive Summary
 
-This implementation plan outlines the development of a Windows 11 desktop application that provides AI-powered gaming assistance for The Sims 4 and other strategy/RPG games. The system uses hotkey activation, voice recording, screenshot capture, and multimodal LLM integration to provide contextual gaming advice.
+This implementation plan outlines the development of a Windows 11 desktop application that provides AI-powered gaming assistance for strategy and RPG games. The system uses hotkey activation, voice recording, screenshot capture, and multimodal LLM integration to provide contextual gaming advice.
 
 ## Architecture Overview
 

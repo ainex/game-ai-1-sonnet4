@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Sims 4 AI Gaming Assistant - Development Environment Setup Script
-# This script sets up the development environment for the Sims 4 AI Assistant project
+# AI Gaming Assistant - Development Environment Setup Script
+# This script sets up the development environment for the AI Gaming Assistant project
 # It installs dependencies, linters, formatters, and testing tools
 
 set -e  # Exit on any error
 
-echo "🎮 Setting up Sims 4 AI Gaming Assistant development environment..."
+echo "🎮 Setting up AI Gaming Assistant development environment..."
 
 # Function to check if command exists
 command_exists() {
@@ -413,7 +413,7 @@ EOF
 
     # Create .env.example
     cat > .env.example << EOF
-# Sims 4 AI Gaming Assistant Environment Variables
+# AI Gaming Assistant Environment Variables
 # Copy this file to .env and fill in the actual values
 
 # Development settings
@@ -426,7 +426,7 @@ OPENAI_API_KEY=mock_key_for_testing
 CLAUDE_API_KEY=mock_key_for_testing
 
 # Database settings
-DATABASE_URL=sqlite:///./sims4_assistant.db
+DATABASE_URL=sqlite:///./game_assistant.db
 
 # Server settings
 HOST=localhost
@@ -442,7 +442,7 @@ SCREENSHOT_QUALITY=85
 MAX_IMAGE_SIZE=1920x1080
 
 # Game settings
-SIMS4_INSTALL_PATH=/path/to/sims4
+GAME_INSTALL_PATH=/path/to/game
 SCREENSHOTS_DIR=./screenshots
 RECORDINGS_DIR=./recordings
 EOF
@@ -717,13 +717,13 @@ create_initial_docs() {
 
     # Create docs/index.md
     cat > docs/index.md << EOF
-# Sims 4 AI Gaming Assistant Documentation
+# AI Gaming Assistant Documentation
 
-Welcome to the Sims 4 AI Gaming Assistant project documentation.
+Welcome to the AI Gaming Assistant project documentation.
 
 ## Overview
 
-This project is a Windows desktop application that provides AI-powered gaming assistance for The Sims 4. The system uses voice recording, screenshot capture, and LLM integration to help players with gameplay strategies, character development, and in-game decision making.
+This project is a Windows desktop application that provides AI-powered gaming assistance for strategy and RPG games. The system uses voice recording, screenshot capture, and LLM integration to help players with gameplay strategies, character development, and in-game decision making.
 
 ## Architecture
 
@@ -756,7 +756,7 @@ EOF
     cat > docs/api/README.md << EOF
 # API Documentation
 
-This directory contains API documentation for the Sims 4 AI Gaming Assistant.
+This directory contains API documentation for the AI Gaming Assistant.
 
 ## Server API Endpoints
 
@@ -774,7 +774,7 @@ This directory contains API documentation for the Sims 4 AI Gaming Assistant.
 - \`GET /api/llm/models\` - Get available LLM models
 
 ### Game Data
-- \`GET /api/game/status\` - Get Sims 4 game status
+- \`GET /api/game/status\` - Get game status
 - \`POST /api/game/advice\` - Get gameplay advice
 
 Documentation is automatically generated from FastAPI schemas.
@@ -880,7 +880,7 @@ except ImportError as e:
 
 # Main execution
 main() {
-    echo "Starting Sims 4 AI Gaming Assistant setup..."
+    echo "Starting AI Gaming Assistant setup..."
 
     # Always attempt to install/update system packages
     echo "📦 Attempting to install/update system packages (this may require sudo)..."
@@ -918,7 +918,7 @@ main() {
     # Verify AI installation
     verify_ai_development
 
-    echo "🎉 Sims 4 AI Gaming Assistant LIGHTWEIGHT development environment setup complete!"
+    echo "🎉 AI Gaming Assistant LIGHTWEIGHT development environment setup complete!"
     echo ""
     echo "🔧 Codex Development Environment Ready:"
     echo "   - CPU-only PyTorch for development"

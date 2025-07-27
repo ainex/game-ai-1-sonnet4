@@ -1,6 +1,6 @@
-# Sims 4 AI Gaming Assistant
+# AI Gaming Assistant
 
-A **Windows desktop application that provides AI-powered gaming assistance for The Sims 4**. The system uses voice recording, screenshot capture, and LLM integration to help players with gameplay strategies, character development, and in-game decision making.
+A **Windows desktop application that provides AI-powered gaming assistance for strategy and RPG games**. The system uses voice recording, screenshot capture, and LLM integration to help players with gameplay strategies, character development, and in-game decision making.
 
 ## 🏗️ Architecture
 
@@ -143,7 +143,7 @@ game-ai-1-sonnet4/
 
 ### Screenshot Analysis
 - Automatic game screen capture
-- AI-powered image analysis of Sims 4 UI
+- AI-powered image analysis of game UI
 - Context-aware gameplay suggestions
 
 ### LLM Integration
@@ -245,7 +245,7 @@ OPENAI_API_KEY=your_actual_openai_api_key_here
 CLAUDE_API_KEY=mock_key_for_testing
 
 # Database
-DATABASE_URL=sqlite:///./sims4_assistant.db
+DATABASE_URL=sqlite:///./game_assistant.db
 
 # Audio settings
 AUDIO_SAMPLE_RATE=44100
@@ -278,7 +278,7 @@ This repository is fully prepared for OpenAI Codex agent work:
 - ✅ **Client-server architecture** with clear separation
 - ✅ **Comprehensive mocking** for offline development
 - ✅ **Testing framework** with audio/visual test support
-- ✅ **Environment configuration** for Sims 4 integration
+- ✅ **Environment configuration** for game integration
 - ✅ **Pre-commit hooks** for code quality
 
 The Codex agent will automatically read the `AGENTS.md` file and use the setup script to prepare the development environment with all necessary audio, visual, and LLM integration tools.
@@ -313,4 +313,4 @@ This project follows enterprise-scale development practices. See individual file
 
 ---
 
-*Built with ❤️ using AI-assisted development practices for The Sims 4 gaming community*
+*Built with ❤️ using AI-assisted development practices for the gaming community*

@@ -1,6 +1,6 @@
 # CUDA Setup Guide for GPU-Accelerated TTS
 
-This guide helps you set up CUDA acceleration for the Text-to-Speech service in the Sims 4 AI Gaming Assistant. GPU acceleration dramatically improves TTS performance, reducing generation time from 15-30 seconds to 1-3 seconds per sentence.
+This guide helps you set up CUDA acceleration for the Text-to-Speech service in the AI Gaming Assistant. GPU acceleration dramatically improves TTS performance, reducing generation time from 15-30 seconds to 1-3 seconds per sentence.
 
 ## Hardware Requirements
 
@@ -76,7 +76,7 @@ python scripts/verify_cuda.py
 
 Expected output for successful setup:
 ```
-🎮 Sims 4 AI Gaming Assistant - CUDA Verification
+🎮 AI Gaming Assistant - CUDA Verification
 =======================================================
 
 === Python Version Check ===
@@ -262,4 +262,4 @@ After successful CUDA setup:
 3. **Test API endpoints**: Use `/api/v1/tts/speak` with GPU acceleration
 4. **Monitor performance**: Watch GPU utilization with `nvidia-smi`
 
-Your RTX 4070 Super provides excellent performance for the Sims 4 AI Gaming Assistant! 🚀 
+Your RTX 4070 Super provides excellent performance for the AI Gaming Assistant! 🚀 
