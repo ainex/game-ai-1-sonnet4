@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-PyTorch CUDA Version Fix Script for Sims 4 AI Gaming Assistant
+PyTorch CUDA Version Fix Script for AI Gaming Assistant
 
 This script helps fix PyTorch installation issues by uninstalling current
 PyTorch and reinstalling with the correct CUDA version for TTS compatibility.
@@ -124,7 +124,7 @@ def install_tts():
 
 def main():
     """Main execution flow."""
-    print("🔧 PyTorch CUDA Fix Script for Sims 4 AI Gaming Assistant")
+    print("🔧 PyTorch CUDA Fix Script for AI Gaming Assistant")
     print("=" * 60)
     
     # Check current installation

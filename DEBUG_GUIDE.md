@@ -1,4 +1,4 @@
-# Debug Guide for Sims 4 AI Gaming Assistant
+# Debug Guide for AI Gaming Assistant
 
 This guide will help you troubleshoot the audio playback and response issues you're experiencing.
 

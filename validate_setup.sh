@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Sims 4 AI Gaming Assistant - Setup Validation Script
+# AI Gaming Assistant - Setup Validation Script
 # This script validates that the development environment is properly configured
 
 set -e
 
-echo "🔍 Validating Sims 4 AI Gaming Assistant setup..."
+echo "🔍 Validating AI Gaming Assistant setup..."
 
 # Function to check if command exists
 command_exists() {
@@ -53,7 +53,7 @@ fi
 echo ""
 echo "📦 Critical Python Packages Validation:"
 
-# Core packages for Sims 4 AI Assistant
+# Core packages for AI Gaming Assistant
 packages=(
     "fastapi" "FastAPI framework"
     "uvicorn" "ASGI server"
@@ -227,13 +227,13 @@ else
 fi
 
 echo ""
-echo "🎮 Sims 4 AI Assistant Specific Validation:"
+echo "🎮 AI Gaming Assistant Specific Validation:"
 
 # Check environment variables template
-if grep -q "SIMS4_INSTALL_PATH" .env.example 2>/dev/null; then
-    echo "  ✓ Sims 4 specific environment variables... ✅ PASS"
+if grep -q "GAME_INSTALL_PATH" .env.example 2>/dev/null; then
+    echo "  ✓ Game-specific environment variables... ✅ PASS"
 else
-    echo "  ⚠️  Sims 4 environment variables not found in .env.example"
+    echo "  ⚠️  Game environment variables not found in .env.example"
 fi
 
 # Check for gaming-specific directories in gitignore
@@ -253,13 +253,13 @@ failed_checks=$((failed_packages + failed_tools + failed_dirs + failed_files))
 if [[ $failed_checks -eq 0 ]]; then
     echo "🎉 All validation checks passed! ($total_checks/$total_checks)"
     echo ""
-    echo "✅ Your Sims 4 AI Gaming Assistant development environment is ready!"
+    echo "✅ Your AI Gaming Assistant development environment is ready!"
     echo ""
     echo "🚀 Next steps:"
     echo "1. Activate virtual environment: source venv/bin/activate"
     echo "2. Read AGENTS.md for development workflow"
     echo "3. Start the server: make server"
-    echo "4. Start coding with AI assistance for Sims 4!"
+    echo "4. Start coding with AI assistance for games!"
     echo ""
     echo "🎮 Gaming-specific features ready:"
     echo "- Voice recording system"

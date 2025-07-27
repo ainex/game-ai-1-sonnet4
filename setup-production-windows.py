@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Sims 4 AI Gaming Assistant - PRODUCTION Environment Setup for Windows
+AI Gaming Assistant - PRODUCTION Environment Setup for Windows
 This script sets up the production environment with AI models (no CUDA changes)
 """
 

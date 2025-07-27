@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test script for OpenAI integration in the Sims 4 AI Gaming Assistant.
+Test script for OpenAI integration in the AI Gaming Assistant.
 
 This script tests the new OpenAI-powered endpoints:
 1. /api/v1/openai/analyze-game-with-voice
@@ -31,7 +31,7 @@ def create_test_screenshot():
         font = None
     
     draw.text((50, 50), "Test Game Screenshot", fill='black', font=font)
-    draw.text((50, 100), "Sims 4 Game Interface", fill='blue', font=font)
+    draw.text((50, 100), "Game Interface", fill='blue', font=font)
     draw.text((50, 150), "Character Status: Happy", fill='green', font=font)
     draw.text((50, 200), "Energy: 75%", fill='orange', font=font)
     draw.text((50, 250), "Hunger: 60%", fill='red', font=font)

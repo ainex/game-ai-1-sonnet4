@@ -1,6 +1,6 @@
 # API Documentation
 
-This directory contains API documentation for the Sims 4 AI Gaming Assistant.
+This directory contains API documentation for the AI Gaming Assistant.
 
 ## Server API Endpoints
 
@@ -18,7 +18,7 @@ This directory contains API documentation for the Sims 4 AI Gaming Assistant.
 - `GET /api/llm/models` - Get available LLM models
 
 ### Game Data
-- `GET /api/game/status` - Get Sims 4 game status
+- `GET /api/game/status` - Get game status
 - `POST /api/game/advice` - Get gameplay advice
 
 Documentation is automatically generated from FastAPI schemas.

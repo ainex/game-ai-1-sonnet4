@@ -1,10 +1,10 @@
-# Sims 4 AI Gaming Assistant Documentation
+# AI Gaming Assistant Documentation
 
-Welcome to the Sims 4 AI Gaming Assistant project documentation.
+Welcome to the AI Gaming Assistant project documentation.
 
 ## Overview
 
-This project is a Windows desktop application that provides AI-powered gaming assistance for The Sims 4. The system uses voice recording, screenshot capture, and LLM integration to help players with gameplay strategies, character development, and in-game decision making.
+This project is a Windows desktop application that provides AI-powered gaming assistance for strategy and RPG games. The system uses voice recording, screenshot capture, and LLM integration to help players with gameplay strategies, character development, and in-game decision making.
 
 ## Architecture
 

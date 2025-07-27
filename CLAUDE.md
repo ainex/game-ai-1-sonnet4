@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A **Windows desktop application that provides AI-powered gaming assistance for The Sims 4**. The system captures screenshots and voice input to provide intelligent gameplay advice using multiple LLM APIs (OpenAI GPT-4 Vision, Whisper, Claude) with local TTS/STT capabilities.
+A **Windows desktop application that provides AI-powered gaming assistance for strategy and RPG games**. The system captures screenshots and voice input to provide intelligent gameplay advice using multiple LLM APIs (OpenAI GPT-4 Vision, Whisper, Claude) with local TTS/STT capabilities.
 
 ## Architecture
 
@@ -148,7 +148,7 @@ ENVIRONMENT=development
 OPENAI_API_KEY=your_actual_openai_api_key_here
 
 # Database
-DATABASE_URL=sqlite:///./sims4_assistant.db
+DATABASE_URL=sqlite:///./game_assistant.db
 
 # Audio settings
 AUDIO_SAMPLE_RATE=44100

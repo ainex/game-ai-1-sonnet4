@@ -174,7 +174,7 @@ rich==13.7.0
 # Game AI Assistant - Agent Instructions
 
 ## Project Overview
-Developing a Windows desktop application that provides AI-powered gaming assistance for The Sims 4. The system uses voice recording, screenshot capture, and LLM integration.
+Developing a Windows desktop application that provides AI-powered gaming assistance for strategy and RPG games. The system uses voice recording, screenshot capture, and LLM integration.
 
 ## Architecture
 - **Client**: Windows desktop app (Python/Tkinter or C#)

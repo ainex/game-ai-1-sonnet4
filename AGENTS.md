@@ -1,8 +1,8 @@
-# Sims 4 AI Gaming Assistant - Agent Instructions
+# AI Gaming Assistant - Agent Instructions
 
 ## Project Overview
 
-Developing a **Windows desktop application that provides AI-powered gaming assistance for The Sims 4**. The system uses voice recording, screenshot capture, and LLM integration to help players with gameplay strategies, character development, and in-game decision making.
+Developing a **Windows desktop application that provides AI-powered gaming assistance for strategy and RPG games**. The system uses voice recording, screenshot capture, and LLM integration to help players with gameplay strategies, character development, and in-game decision making.
 
 ## Architecture
 
@@ -268,7 +268,7 @@ Link to the IMPLEMENTATION_PLAN.md that guided this work (if applicable).
 ## Architecture Notes
 
 ### Current State
-- Project is for Sims 4 AI gaming assistance
+- Project is for AI gaming assistance
 - Client-server architecture with clear separation
 - Designed for offline development with comprehensive mocking
 - Focus on voice recording, screenshot capture, and LLM integration
@@ -317,7 +317,7 @@ OPENAI_API_KEY=mock_key_for_testing
 CLAUDE_API_KEY=mock_key_for_testing
 
 # Database
-DATABASE_URL=sqlite:///./sims4_assistant.db
+DATABASE_URL=sqlite:///./game_assistant.db
 
 # Server settings
 HOST=localhost
@@ -334,4 +334,4 @@ MAX_IMAGE_SIZE=1920x1080
 
 ---
 
-*This guide should be updated as the Sims 4 AI Assistant project evolves and new patterns emerge.*
+*This guide should be updated as the AI Gaming Assistant project evolves and new patterns emerge.*

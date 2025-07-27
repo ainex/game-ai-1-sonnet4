@@ -29,7 +29,7 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
-logger.info("🚀 Starting Sims 4 AI Gaming Assistant Server...")
+logger.info("🚀 Starting AI Gaming Assistant Server...")
 
 app = FastAPI()
 

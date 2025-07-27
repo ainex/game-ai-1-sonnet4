@@ -384,8 +384,8 @@ def test_tts_service() -> None:
 
 def main() -> None:
     """Entry point for the client with updated hotkeys."""
-    logger.info("🎮 Sims 4 AI Gaming Assistant Client Starting...")
-    print("🎮 Sims 4 AI Gaming Assistant Client")
+    logger.info("🎮 AI Gaming Assistant Client Starting...")
+    print("🎮 AI Gaming Assistant Client")
     print("📋 Available hotkeys:")
     print("  Ctrl+Shift+V: 🎤📸 NEW! Capture screenshot + record voice (with pleasant chimes)")
     print("  Ctrl+Shift+S: 📸🔊 Capture screenshot + AI analysis + speech")

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-CUDA Setup Verification Script for Sims 4 AI Gaming Assistant
+CUDA Setup Verification Script for AI Gaming Assistant
 
 This script verifies that CUDA, PyTorch, and the TTS service are properly
 configured for GPU acceleration on your system.
@@ -228,7 +228,7 @@ def provide_recommendations() -> None:
 
 def main() -> None:
     """Run complete CUDA verification."""
-    print("🎮 Sims 4 AI Gaming Assistant - CUDA Verification")
+    print("🎮 AI Gaming Assistant - CUDA Verification")
     print("=" * 55)
     
     results = []
