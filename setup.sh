@@ -226,7 +226,7 @@ setup_virtual_env() {
     echo "export PATH=\"$(pwd)/venv/bin:\$PATH\"" >> ~/.bashrc
     echo "export PYTHONPATH=\"$(pwd):\$PYTHONPATH\"" >> ~/.bashrc
     echo "export ENVIRONMENT=\"development\"" >> ~/.bashrc
-    echo "export DATABASE_URL=\"sqlite:///./sims4_assistant.db\"" >> ~/.bashrc
+    echo "export DATABASE_URL=\"sqlite:///./game_assistant.db\"" >> ~/.bashrc
 
     echo "✅ Virtual environment activated"
 }
@@ -424,6 +424,7 @@ ENVIRONMENT=development
 # API Keys (use mocks in development)
 OPENAI_API_KEY=mock_key_for_testing
 CLAUDE_API_KEY=mock_key_for_testing
+GITHUB_API_KEY=mock_key_for_testing
 
 # Database settings
 DATABASE_URL=sqlite:///./game_assistant.db

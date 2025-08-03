@@ -265,6 +265,7 @@ All external services MUST be mocked:
 echo 'export PYTHONPATH="/workspace:$PYTHONPATH"' >> ~/.bashrc
 echo 'export ENVIRONMENT="development"' >> ~/.bashrc
 echo 'export DATABASE_URL="sqlite:///./game_ai_assistant.db"' >> ~/.bashrc
+echo 'export GITHUB_API_KEY="mock_key_for_testing"' >> ~/.bashrc
 
 # Reload environment
 source ~/.bashrc

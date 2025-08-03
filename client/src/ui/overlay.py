@@ -12,6 +12,7 @@ class SciFiOverlay:
     def __init__(self):
         self.window = None
         self.text_widget = None
+        self.status_label = None  # Initialize status_label
         self.is_visible = False
         
         # Sci-fi color scheme (Claude Code inspired)

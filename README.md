@@ -243,6 +243,7 @@ ENVIRONMENT=development
 # API Keys (use mocks in development)
 OPENAI_API_KEY=your_actual_openai_api_key_here
 CLAUDE_API_KEY=mock_key_for_testing
+GITHUB_API_KEY=mock_key_for_testing
 
 # Database
 DATABASE_URL=sqlite:///./game_assistant.db

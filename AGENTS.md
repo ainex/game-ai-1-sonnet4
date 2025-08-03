@@ -18,7 +18,7 @@ This project follows the **AI-Assisted Software Development Workflow** outlined 
 1. **Feature Planning**: Create detailed `IMPLEMENTATION_PLAN.md` documents before coding
 2. **Dependency Analysis**: AI-assisted identification of relevant code segments
 3. **Step-by-Step Implementation**: Follow the detailed plan as single source of truth
-4. **Documentation & Cleanup**: Update module READMEs and remove implementation plans
+4. **Documentation & Cleanup**: Update module READMEs and keep the  implementation plans
 
 ## File and Folder Structure
 
@@ -315,6 +315,7 @@ ENVIRONMENT=development
 # API Keys (use mocks in development)
 OPENAI_API_KEY=mock_key_for_testing
 CLAUDE_API_KEY=mock_key_for_testing
+GITHUB_API_KEY=mock_key_for_testing
 
 # Database
 DATABASE_URL=sqlite:///./game_assistant.db
@@ -331,7 +332,3 @@ AUDIO_CHANNELS=1
 SCREENSHOT_QUALITY=85
 MAX_IMAGE_SIZE=1920x1080
 ```
-
----
-
-*This guide should be updated as the AI Gaming Assistant project evolves and new patterns emerge.*
