@@ -5,9 +5,24 @@ import base64
 from functools import lru_cache
 from typing import Optional, Dict, Any
 import os
+from pathlib import Path
 
-# Set up logging
+# Set up logging first
 logger = logging.getLogger(__name__)
+
+# Secure environment loading
+try:
+    from dotenv import load_dotenv
+    # Load .env from project root (3 levels up from this file)
+    project_root = Path(__file__).parent.parent.parent.parent
+    env_path = project_root / ".env"
+    if env_path.exists():
+        load_dotenv(env_path, override=False)  # Don't override existing env vars
+        logger.info(f"✅ Loaded environment from {env_path}")
+    else:
+        logger.info("ℹ️ No .env file found, using system environment variables")
+except ImportError:
+    logger.warning("⚠️ python-dotenv not available, using system environment variables only")
 
 try:
     from openai import OpenAI
@@ -27,12 +42,28 @@ class OpenAIService:
         else:
             try:
                 api_key = os.getenv("OPENAI_API_KEY")
-                if not api_key or api_key == "mock_key_for_testing":
-                    logger.warning("⚠️ OpenAI API key not configured - using mock mode")
+                
+                # Secure API key validation
+                if not api_key:
+                    logger.warning("⚠️ OPENAI_API_KEY not found - using mock mode")
+                    self._client = None
+                elif api_key == "mock_key_for_testing":
+                    logger.warning("⚠️ Using mock API key - using mock mode")
+                    self._client = None
+                elif len(api_key) < 20:  # Basic validation
+                    logger.error("❌ OPENAI_API_KEY appears invalid (too short) - using mock mode")
+                    self._client = None
+                elif not api_key.startswith("sk-"):
+                    logger.error("❌ OPENAI_API_KEY appears invalid (wrong format) - using mock mode")
                     self._client = None
                 else:
+                    # Mask API key in logs for security
+                    masked_key = f"{api_key[:10]}...{api_key[-4:]}"
+                    logger.info(f"🔑 Using OpenAI API key: {masked_key}")
+                    
                     self._client = OpenAI(api_key=api_key)
                     logger.info("✅ OpenAI client initialized successfully")
+                    
             except Exception as e:
                 logger.error(f"❌ OpenAI client initialization failed: {e}")
                 self._client = None
@@ -93,7 +124,7 @@ class OpenAIService:
             logger.info("🤖 Sending request to OpenAI GPT-4 Vision...")
             
             response = self._client.chat.completions.create(
-                model="gpt-4-vision-preview",
+                model="gpt-4o-mini",
                 messages=messages,
                 max_tokens=1000,
                 temperature=0.7

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A **Windows desktop application that provides AI-powered gaming assistance for strategy and RPG games**. The system captures screenshots and voice input to provide intelligent gameplay advice using multiple LLM APIs (OpenAI GPT-4 Vision, Whisper, Claude) with local TTS/STT capabilities.
+A **Windows desktop application that provides AI-powered gaming assistance for strategy and RPG games**. The system captures screenshots and voice input to provide intelligent gameplay advice using multiple LLM APIs (Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o, Whisper) with local TTS capabilities and a beautiful sci-fi overlay UI.
 
 ## Architecture
 
@@ -13,7 +13,8 @@ A **Windows desktop application that provides AI-powered gaming assistance for s
 - **Server** (`server/src/`): FastAPI backend with AI services (deployable locally or cloud)
 - **Shared** (`shared/`): Common models and utilities
 - **Database**: SQLite for local storage
-- **Integration**: OpenAI (GPT-4 Vision + Whisper), Claude, local TTS/STT
+- **Integration**: Anthropic Claude 3.5 Sonnet (primary), OpenAI GPT-4o + Whisper, local TTS
+- **UI**: Sci-fi transparent overlay for displaying AI responses (always-on-top)
 
 ## Development Commands
 
@@ -22,11 +23,21 @@ A **Windows desktop application that provides AI-powered gaming assistance for s
 # Setup development environment (Linux/WSL)
 ./setup.sh
 
-# Windows setup (manual)
+# Windows setup (recommended)
 python -m venv venv
 .\venv\Scripts\activate
 pip install -r requirements.txt
-pip install keyboard
+
+# SECURE API KEY SETUP (REQUIRED)
+# 1. Copy the example environment file (if it exists)
+# cp .env.example .env
+
+# 2. Create .env file and add your real API keys
+# ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
+# OPENAI_API_KEY=sk-your-openai-key-here
+
+# 3. Install additional Windows-only dependencies if needed
+pip install keyboard  # For global hotkeys on Windows
 ```
 
 ### Running the Application
@@ -58,11 +69,11 @@ pytest tests/ -v -m "not slow"
 
 ### Code Quality
 ```bash
-# Format code
+# Format code (uses pyproject.toml config)
 python -m black server/ client/ tests/
 python -m isort server/ client/ tests/
 
-# Type checking
+# Type checking (configured for Python 3.12)
 python -m mypy server/src/
 
 # Linting
@@ -70,6 +81,9 @@ python -m flake8 server/ client/ tests/
 
 # Security checks
 python -m bandit -r server/src/
+
+# Run pre-commit hooks
+pre-commit run --all-files
 ```
 
 ### Special Test Scripts
@@ -88,25 +102,31 @@ python scripts/verify_cuda.py
 
 ### API Endpoint Structure
 The server follows a modular endpoint pattern in `server/src/api/endpoints/`:
-- `openai_analysis.py`: OpenAI GPT-4 Vision + Whisper integration
+- `claude_analysis.py`: Anthropic Claude 3.5 Sonnet multimodal integration (primary)
+- `openai_analysis.py`: OpenAI GPT-4o + Whisper integration (backup)
 - `image_analysis.py`: Local image captioning using Transformers
 - `stt.py`: Speech-to-text using local Whisper
 - `tts.py`: Text-to-speech using local TTS models
 - `game_analysis.py`: Combined analysis workflows
+- `analyze.py`: General analysis endpoint
 
 ### Service Layer Pattern
 Business logic is separated into `server/src/services/`:
-- `openai_service.py`: OpenAI API integration with error handling
+- `claude_service.py`: Anthropic Claude 3.5 Sonnet API integration (primary)
+- `openai_service.py`: OpenAI API integration with error handling (backup)
 - `image_analysis.py`: Local vision models (BLIP, etc.)
 - `stt.py`: Local speech recognition
 - `tts.py`: Local speech synthesis with GPU acceleration
 
 ### Client Hotkey System
 The client uses global hotkeys for seamless gaming integration:
-- **Ctrl+Shift+V**: Complete voice + screenshot analysis (recommended)
+- **Ctrl+Shift+C**: Claude-powered analysis with sci-fi overlay (recommended)
+- **Ctrl+Shift+V**: OpenAI-powered voice + screenshot analysis
 - **Ctrl+Shift+S**: Screenshot + AI description + TTS
 - **Ctrl+Shift+A**: Screenshot + text analysis only
 - **Ctrl+Shift+T**: Test TTS service
+
+**Note**: The client includes a transparent sci-fi overlay UI (`client/src/ui/overlay.py`) for displaying AI responses always-on-top during gameplay.
 
 ### Mock Strategy for Development
 All external services are mocked by default using `pytest` and `responses`:
@@ -144,8 +164,10 @@ This project follows the structured workflow in `AGENTS.md`:
 DEBUG=true
 ENVIRONMENT=development
 
-# API Keys (mocked by default)
-OPENAI_API_KEY=your_actual_openai_api_key_here
+# API Keys (SECURE .env SETUP REQUIRED)
+# Copy .env.example to .env and add your real keys:
+# ANTHROPIC_API_KEY=sk-ant-api03-your-key-here  
+# OPENAI_API_KEY=sk-your-openai-key-here
 
 # Database
 DATABASE_URL=sqlite:///./game_assistant.db
@@ -161,8 +183,9 @@ MAX_IMAGE_SIZE=1920x1080
 
 ### Windows-Specific Requirements
 - Visual Studio Build Tools for TTS compilation
-- Python 3.11+ for server and client
+- Python 3.11+ for server and client (project configured for 3.12)
 - Audio system libraries (automatic fallback handling in client)
+- `keyboard` library for global hotkey support
 
 ## GPU Acceleration Support
 The project supports NVIDIA CUDA for faster TTS generation:
@@ -178,7 +201,8 @@ The project supports NVIDIA CUDA for faster TTS generation:
 - Pydantic 2.5.2 for data validation
 
 ### AI/ML Libraries
-- OpenAI >= 1.0.0 for GPT-4 Vision + Whisper
+- Anthropic >= 0.18.0 for Claude 3.5 Sonnet multimodal
+- OpenAI >= 1.0.0 for GPT-4o + Whisper
 - Transformers >= 4.35.0 for local vision models
 - TTS >= 0.19.0 for local speech synthesis
 - Torch/TorchVision for GPU acceleration
@@ -192,6 +216,16 @@ The project supports NVIDIA CUDA for faster TTS generation:
 - pytest 7.4.3 with asyncio and mock support
 - responses 0.24.1 for HTTP mocking
 - pytest-cov for coverage reporting
+- pytest-mock for advanced mocking capabilities
+- faker for test data generation
+
+### Development Tools
+- black for code formatting (configured in pyproject.toml)
+- isort for import sorting
+- mypy for type checking (Python 3.12 target)
+- flake8 for linting
+- bandit for security analysis
+- pre-commit for automated quality checks
 
 ## Common Tasks
 

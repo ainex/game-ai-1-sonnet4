@@ -15,6 +15,7 @@ if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
 from core.voice_recorder import get_voice_recorder
+from ui.overlay import get_overlay
 
 # Set up logging for Windows compatibility
 import sys
@@ -133,6 +134,142 @@ def play_audio(audio_path):
         logger.error(f"❌ pyaudio failed: {e}")
     
     logger.error(f"🔇 All audio libraries failed. Audio saved to: {audio_path}")
+
+
+def capture_screenshot_and_record_voice_claude() -> None:
+    """Capture screenshot AND record voice, then send both to Claude for analysis with overlay display."""
+    logger.info("🤖 Starting Claude-powered screenshot + voice capture...")
+    
+    # Get overlay and voice recorder
+    overlay = get_overlay()
+    recorder = get_voice_recorder()
+    
+    try:
+        # Show processing status in overlay
+        overlay.set_processing_status()
+        
+        # Step 1: Capture screenshot
+        logger.info("📸 Capturing screenshot...")
+        screenshot = ImageGrab.grab()
+        logger.info(f"📸 Screenshot captured: {screenshot.size} pixels")
+        
+        # Save screenshot to buffer
+        screenshot_buffer = io.BytesIO()
+        screenshot.save(screenshot_buffer, format="PNG")
+        screenshot_buffer.seek(0)
+        screenshot_size = len(screenshot_buffer.getvalue())
+        logger.info(f"📸 Screenshot saved to buffer: {screenshot_size} bytes")
+        
+        # Step 2: Start voice recording
+        logger.info("🎤 Starting voice recording (speak after the chime, it will auto-stop when you're done)...")
+        print("🎤 Recording started! Speak after the chime. Recording will auto-stop after silence.")
+        
+        recording_success = recorder.start_recording()
+        if not recording_success:
+            logger.error("❌ Failed to start voice recording")
+            print("❌ Voice recording failed. Using screenshot only.")
+            overlay.display_error("Voice recording failed. Please check your microphone.")
+            return
+        
+        # Wait for recording to complete (it will auto-stop on silence)
+        print("🎤 Recording... (will auto-stop after 2 seconds of silence)")
+        while recorder.is_recording_active():
+            time.sleep(0.1)
+        
+        # Get recorded audio
+        audio_bytes = recorder.stop_recording()
+        if audio_bytes is None:
+            logger.warning("⚠️ No audio recorded, aborting")
+            print("⚠️ No voice recorded. Please try again.")
+            overlay.display_error("No voice recorded. Please speak louder or check your microphone.")
+            return
+        
+        logger.info(f"🎵 Voice recorded: {len(audio_bytes)} bytes")
+        print(f"✅ Voice recording completed: {len(audio_bytes)} bytes")
+        
+        # Step 3: Send both to Claude server
+        logger.info("🤖 Sending screenshot + voice to Claude for analysis...")
+        print("🤖 Analyzing screenshot and voice with Claude...")
+        
+        # Prepare files for upload with system prompt
+        screenshot_buffer.seek(0)
+        files = {
+            "image": ("screenshot.png", screenshot_buffer, "image/png"),
+            "audio": ("voice.wav", io.BytesIO(audio_bytes), "audio/wav")
+        }
+        data = {
+            "system_prompt": "You are the greatest gamer and assistant. Here is my game situation screenshot and my question. Provide specific, actionable advice for the player."
+        }
+        
+        response = requests.post(
+            "http://localhost:8000/api/v1/claude/analyze-game-with-voice",
+            files=files,
+            data=data,
+            timeout=120,  # Longer timeout for Claude processing
+        )
+        
+        logger.info(f"📡 Server response status: {response.status_code}")
+        logger.info(f"📡 Server response headers: {dict(response.headers)}")
+        logger.info(f"📡 Response content length: {len(response.content)} bytes")
+        
+        if response.status_code == 200:
+            logger.info("✅ Claude analysis complete! Processing audio response...")
+            print("✅ Analysis complete! Playing AI response...")
+            
+            # Also get the text response for overlay (make another call for text)
+            try:
+                # Make a quick text-only call to get the response text for overlay
+                text_response = requests.post(
+                    "http://localhost:8000/api/v1/claude/analyze-game-text-only",
+                    files={"image": ("screenshot.png", io.BytesIO(screenshot_buffer.getvalue()), "image/png")},
+                    data={
+                        "question": "Previous question transcribed from voice",
+                        "system_prompt": data["system_prompt"]
+                    },
+                    timeout=60
+                )
+                
+                if text_response.status_code == 200:
+                    text_result = text_response.json()
+                    ai_text = text_result.get('response', 'Analysis completed successfully.')
+                    overlay.display_response(ai_text)
+                else:
+                    overlay.display_response("Analysis completed successfully. Check audio for full response.")
+                    
+            except Exception as text_error:
+                logger.warning(f"⚠️ Could not get text response for overlay: {text_error}")
+                overlay.display_response("Analysis completed successfully. Check audio for full response.")
+            
+            # Save and play the audio response
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_file:
+                tmp_file.write(response.content)
+                audio_path = tmp_file.name
+            
+            logger.info(f"💾 Response audio saved to temporary file: {audio_path}")
+            
+            # Use our improved audio playback function
+            play_audio(audio_path)
+            
+            # Clean up temporary file
+            try:
+                os.unlink(audio_path)
+                logger.info("🧹 Temporary audio file cleaned up")
+            except Exception as e:
+                logger.warning(f"⚠️ Failed to clean up temporary file: {e}")
+        else:
+            logger.error(f"❌ Request failed with status {response.status_code}")
+            logger.error(f"❌ Response text: {response.text}")
+            print(f"❌ Analysis failed: {response.status_code}")
+            overlay.display_error(f"Analysis failed: {response.status_code}\n{response.text}")
+            
+    except requests.RequestException as exc:
+        logger.error(f"❌ Request failed: {exc}")
+        print(f"❌ Connection failed: {exc}")
+        overlay.display_error(f"Connection failed: {exc}")
+    except Exception as exc:
+        logger.error(f"❌ Unexpected error: {exc}")
+        print(f"❌ Error: {exc}")
+        overlay.display_error(f"Unexpected error: {exc}")
 
 
 def capture_and_analyze_with_speech() -> None:
@@ -387,21 +524,24 @@ def main() -> None:
     logger.info("🎮 AI Gaming Assistant Client Starting...")
     print("🎮 AI Gaming Assistant Client")
     print("📋 Available hotkeys:")
-    print("  Ctrl+Shift+V: 🎤📸 NEW! Capture screenshot + record voice (with pleasant chimes)")
-    print("  Ctrl+Shift+S: 📸🔊 Capture screenshot + AI analysis + speech")
-    print("  Ctrl+Shift+A: 📸📝 Capture screenshot + text analysis only")
+    print("  Ctrl+Shift+C: 🤖📸 NEW! Claude-powered analysis with sci-fi overlay")
+    print("  Ctrl+Shift+V: 🎤📸 OpenAI-powered voice + screenshot analysis")
+    print("  Ctrl+Shift+S: 📸🔊 Screenshot + AI analysis + speech")
+    print("  Ctrl+Shift+A: 📸📝 Screenshot + text analysis only")
     print("  Ctrl+Shift+T: 🔊🧪 Test TTS service")
     print("  Esc: Quit")
     print()
-    print("🎯 RECOMMENDED: Use Ctrl+Shift+V for the complete voice + screenshot experience!")
+    print("🎯 RECOMMENDED: Use Ctrl+Shift+C for Claude-powered analysis with beautiful overlay!")
+    print("🤖 Features Claude 3.5 Sonnet multimodal analysis with transparent sci-fi UI")
     print("🎤 Voice recording will auto-stop after 2 seconds of silence (no need to hold button)")
     print()
     
     # Register hotkeys for new functionality
-    keyboard.add_hotkey("ctrl+shift+v", capture_screenshot_and_record_voice)  # NEW combined function
-    keyboard.add_hotkey("ctrl+shift+s", capture_and_analyze_with_speech)      # Existing screenshot + TTS
-    keyboard.add_hotkey("ctrl+shift+a", capture_and_analyze_text_only)        # Existing screenshot only
-    keyboard.add_hotkey("ctrl+shift+t", test_tts_service)                     # Existing TTS test
+    keyboard.add_hotkey("ctrl+shift+c", capture_screenshot_and_record_voice_claude)  # NEW Claude with overlay
+    keyboard.add_hotkey("ctrl+shift+v", capture_screenshot_and_record_voice)         # OpenAI combined function
+    keyboard.add_hotkey("ctrl+shift+s", capture_and_analyze_with_speech)             # Existing screenshot + TTS
+    keyboard.add_hotkey("ctrl+shift+a", capture_and_analyze_text_only)               # Existing screenshot only
+    keyboard.add_hotkey("ctrl+shift+t", test_tts_service)                            # Existing TTS test
     
     logger.info("✅ Client ready! Use the hotkeys above or press Esc to quit.")
     print("✅ Client ready! Use the hotkeys above or press Esc to quit.")
