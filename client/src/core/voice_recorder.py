@@ -37,9 +37,10 @@ class VoiceRecorder:
         self,
         sample_rate: int = 16000,
         channels: int = 1,
-        silence_threshold: float = 0.01,
+        silence_threshold: float = 0.001,  # Lower threshold for better sensitivity
         silence_duration: float = 2.0,
-        max_recording_time: float = 30.0
+        max_recording_time: float = 30.0,
+        min_recording_time: float = 1.0  # Minimum recording time
     ):
         """Initialize voice recorder.
         
@@ -49,12 +50,14 @@ class VoiceRecorder:
             silence_threshold: Volume threshold below which audio is considered silence
             silence_duration: Seconds of silence before auto-stopping recording
             max_recording_time: Maximum recording time in seconds
+            min_recording_time: Minimum recording time before allowing silence detection
         """
         self.sample_rate = sample_rate
         self.channels = channels
         self.silence_threshold = silence_threshold
         self.silence_duration = silence_duration
         self.max_recording_time = max_recording_time
+        self.min_recording_time = min_recording_time
         
         self.is_recording = False
         self.audio_data = []
@@ -62,7 +65,6 @@ class VoiceRecorder:
         self.monitoring_thread: Optional[threading.Thread] = None
         self.stop_event = threading.Event()
         self.stream = None
-        self.last_audio_bytes: Optional[bytes] = None  # <-- Store last audio
         
         # Generate pleasant audio feedback sounds
         self._generate_feedback_sounds()
@@ -129,11 +131,18 @@ class VoiceRecorder:
     
     def _monitor_silence(self):
         """Monitor for silence and auto-stop recording."""
+        logger.info("🔍 Silence monitoring thread started")
         silence_start = None
         last_chunk_time = time.time()
         
         while self.is_recording and not self.stop_event.is_set():
             current_time = time.time()
+            recording_duration = current_time - self.recording_start_time
+            
+            # Don't check for silence until minimum recording time has passed
+            if recording_duration < self.min_recording_time:
+                time.sleep(0.1)
+                continue
             
             # Check if we have recent audio data
             if len(self.audio_data) > 0:
@@ -148,10 +157,10 @@ class VoiceRecorder:
                         # Silence detected
                         if silence_start is None:
                             silence_start = current_time
-                            logger.info(f"🔇 Silence detected (volume: {volume:.4f})")
+                            logger.info(f"🔇 Silence detected (volume: {volume:.4f}) after {recording_duration:.1f}s")
                         elif current_time - silence_start >= self.silence_duration:
-                            logger.info(f"🔇 Auto-stopping recording after {self.silence_duration}s of silence")
-                            self.stop_recording()
+                            logger.info(f"🔇 Auto-stopping recording after {self.silence_duration}s of silence (total: {recording_duration:.1f}s)")
+                            self.stop_event.set()  # Signal to stop instead of calling stop_recording
                             break
                     else:
                         # Sound detected, reset silence timer
@@ -165,11 +174,13 @@ class VoiceRecorder:
             if hasattr(self, 'recording_start_time'):
                 if current_time - self.recording_start_time >= self.max_recording_time:
                     logger.info(f"⏰ Max recording time ({self.max_recording_time}s) reached")
-                    self.stop_recording()
+                    self.stop_event.set()  # Signal to stop instead of calling stop_recording
                     break
             
             # Sleep briefly to avoid busy waiting
             time.sleep(0.1)
+        
+        logger.info("🔍 Silence monitoring thread ending")
     
     def start_recording(self):
         """Start voice recording with pleasant feedback sound."""
@@ -179,6 +190,7 @@ class VoiceRecorder:
         
         if self.is_recording:
             logger.warning("⚠️ Recording already in progress")
+            logger.warning(f"⚠️ Current state: is_recording={self.is_recording}, thread_alive={self.monitoring_thread.is_alive() if self.monitoring_thread else 'None'}")
             return False
         
         try:
@@ -190,11 +202,14 @@ class VoiceRecorder:
             # Wait briefly for start sound to play
             time.sleep(0.4)
             
+            # Clean up any existing threads first
+            if self.monitoring_thread is not None and self.monitoring_thread.is_alive():
+                self.stop_event.set()
+                self.monitoring_thread.join(timeout=1.0)
+            
             # Reset recording state
+            self.reset()
             self.is_recording = True
-            self.audio_data = []
-            self.last_audio_bytes = None  # <-- Reset last audio
-            self.stop_event.clear()
             self.recording_start_time = time.time()
             
             # Start recording stream
@@ -218,13 +233,46 @@ class VoiceRecorder:
             self.is_recording = False
             return False
     
+    def reset(self):
+        """Reset the recorder to a clean state."""
+        logger.info("🔄 Resetting voice recorder state...")
+        
+        # Stop any active recording first
+        if self.is_recording:
+            self.is_recording = False
+            self.stop_event.set()
+        
+        # Close stream if active
+        if self.stream is not None:
+            try:
+                self.stream.stop()
+                self.stream.close()
+            except Exception as e:
+                logger.warning(f"⚠️ Error closing stream during reset: {e}")
+            self.stream = None
+        
+        # Wait for monitoring thread to finish
+        if self.monitoring_thread is not None and self.monitoring_thread.is_alive():
+            try:
+                if self.monitoring_thread != threading.current_thread():
+                    self.monitoring_thread.join(timeout=2.0)
+                    if self.monitoring_thread.is_alive():
+                        logger.warning("⚠️ Monitoring thread didn't terminate gracefully")
+            except Exception as e:
+                logger.warning(f"⚠️ Error joining monitoring thread: {e}")
+        
+        # Reset all state variables
+        self.is_recording = False
+        self.audio_data = []
+        self.recording_thread = None
+        self.monitoring_thread = None
+        self.stop_event.clear()
+        
+        logger.info("✅ Voice recorder state reset complete")
+    
     def stop_recording(self) -> Optional[bytes]:
         """Stop recording and return audio data as WAV bytes."""
         if not self.is_recording and len(self.audio_data) == 0:
-            # If we have a last recording, return it
-            if self.last_audio_bytes is not None:
-                logger.info("🔁 Returning last recorded audio bytes")
-                return self.last_audio_bytes
             logger.warning("⚠️ No recording in progress")
             return None
         
@@ -248,19 +296,24 @@ class VoiceRecorder:
                 
                 # Wait for monitoring thread to finish (with timeout and proper thread check)
                 if self.monitoring_thread is not None and self.monitoring_thread.is_alive():
-                    # Check if we're not trying to join the current thread
-                    if self.monitoring_thread != threading.current_thread():
-                        self.monitoring_thread.join(timeout=1.0)
-                    else:
-                        logger.warning("⚠️ Skipping thread join - monitoring thread is current thread")
+                    try:
+                        # Check if we're not trying to join the current thread
+                        if self.monitoring_thread != threading.current_thread():
+                            self.monitoring_thread.join(timeout=2.0)
+                            if self.monitoring_thread.is_alive():
+                                logger.warning("⚠️ Monitoring thread didn't terminate within timeout")
+                        else:
+                            logger.warning("⚠️ Skipping thread join - monitoring thread is current thread")
+                    except Exception as e:
+                        logger.warning(f"⚠️ Error joining monitoring thread: {e}")
+                    finally:
+                        # Clear the thread reference regardless
+                        self.monitoring_thread = None
             else:
                 logger.info("🛑 Recording already stopped, processing audio data...")
             
             # Process recorded audio
             if len(self.audio_data) == 0:
-                if self.last_audio_bytes is not None:
-                    logger.info("🔁 Returning last recorded audio bytes")
-                    return self.last_audio_bytes
                 logger.warning("⚠️ No audio data recorded")
                 return None
             
@@ -274,9 +327,8 @@ class VoiceRecorder:
             buffer.seek(0)
             audio_bytes = buffer.getvalue()
             
-            # Clear audio data after processing
+            # Clear audio data after processing (but don't reset everything)
             self.audio_data = []
-            self.last_audio_bytes = audio_bytes  # <-- Store last audio
             
             logger.info(f"✅ Voice recording completed: {len(audio_bytes)} bytes")
             return audio_bytes

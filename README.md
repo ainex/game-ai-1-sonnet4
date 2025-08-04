@@ -17,8 +17,20 @@ A **Windows desktop application that provides AI-powered gaming assistance for s
    ```
 
 2. **Activate the virtual environment:**
+   
+   **Linux/macOS:**
    ```bash
    source venv/bin/activate
+   ```
+   
+   **Windows (PowerShell):**
+   ```powershell
+   .\venv\Scripts\Activate.ps1
+   ```
+   
+   **Windows (Command Prompt):**
+   ```cmd
+   venv\Scripts\activate
    ```
 
 3. **Start the server:**
