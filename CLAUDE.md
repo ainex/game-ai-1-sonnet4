@@ -29,12 +29,13 @@ python -m venv venv
 pip install -r requirements.txt
 
 # SECURE API KEY SETUP (REQUIRED)
-# 1. Copy the example environment file (if it exists)
-# cp .env.example .env
+# 1. Copy the example environment file
+cp .env.example .env
 
-# 2. Create .env file and add your real API keys
+# 2. Edit .env file and add your real API keys
 # ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
 # OPENAI_API_KEY=sk-your-openai-key-here
+# DEFAULT_MODEL=claude-4-sonnet  # Options: claude-3.5-sonnet, claude-4-sonnet, gpt-4o-mini, gpt-4o, o3
 
 # 3. Install additional Windows-only dependencies if needed
 pip install keyboard  # For global hotkeys on Windows
@@ -88,6 +89,9 @@ pre-commit run --all-files
 
 ### Special Test Scripts
 ```bash
+# Test Claude 4 models (including new reasoning models)
+python test_claude4_models.py
+
 # Test OpenAI integration
 python test_openai_integration.py
 
@@ -112,11 +116,24 @@ The server follows a modular endpoint pattern in `server/src/api/endpoints/`:
 
 ### Service Layer Pattern
 Business logic is separated into `server/src/services/`:
-- `claude_service.py`: Anthropic Claude 3.5 Sonnet API integration (primary)
-- `openai_service.py`: OpenAI API integration with error handling (backup)
+- `claude_service.py`: Anthropic Claude API integration (supports Claude 3.5 Sonnet and Claude 4 Sonnet)
+- `openai_service.py`: OpenAI API integration (supports GPT-4o-mini, GPT-4o, and o3 models)
 - `image_analysis.py`: Local vision models (BLIP, etc.)
 - `stt.py`: Local speech recognition
 - `tts.py`: Local speech synthesis with GPU acceleration
+
+### Model Configuration
+The system supports multiple AI models with easy configuration:
+- **Default Model**: Set via `DEFAULT_MODEL` environment variable or client config
+- **Claude Models**: 
+  - `claude-3.5-sonnet`: Claude 3.5 Sonnet
+  - `claude-4-sonnet`: Claude 4 Sonnet (standard reasoning)
+  - `claude-4-opus`: Claude 4 Opus (most powerful model)
+  - `claude-4-sonnet-thinking`: Claude 4 Sonnet with extended thinking
+  - `claude-4-opus-thinking`: Claude 4 Opus with extended thinking
+- **OpenAI Models**: `gpt-4o-mini`, `gpt-4o`, `o3` (using gpt-4o until o3 is released)
+- **Server Config**: `server/src/core/config.py` handles model mappings
+- **Client Config**: `client/src/core/config.py` stores user preferences
 
 ### Client Hotkey System
 The client uses global hotkeys for seamless gaming integration:
@@ -168,6 +185,11 @@ ENVIRONMENT=development
 # Copy .env.example to .env and add your real keys:
 # ANTHROPIC_API_KEY=sk-ant-api03-your-key-here  
 # OPENAI_API_KEY=sk-your-openai-key-here
+
+# Model Configuration (choose one)
+# DEFAULT_MODEL=claude-4-sonnet         # Standard Claude 4 Sonnet
+# DEFAULT_MODEL=claude-4-opus           # Most powerful Claude 4 model
+# DEFAULT_MODEL=claude-4-opus-thinking  # Claude 4 Opus with extended reasoning
 
 # Database
 DATABASE_URL=sqlite:///./game_assistant.db

@@ -23,7 +23,8 @@ async def analyze_game_with_openai_and_voice(
     audio: UploadFile = File(...),
     system_prompt: str = Form(
         default="You are a helpful game assistant. Analyze the screenshot and answer the user's question about the game situation. Provide specific, actionable advice for the player."
-    )
+    ),
+    model: str = Form(default=None)
 ) -> StreamingResponse:
     """
     Analyze game screenshot and voice question using OpenAI, then return spoken response.
@@ -37,6 +38,7 @@ async def analyze_game_with_openai_and_voice(
     logger.info(f"📸 Image file: {image.filename}, size: {image.size} bytes")
     logger.info(f"🎵 Audio file: {audio.filename}, size: {audio.size} bytes")
     logger.info(f"🤖 System prompt: '{system_prompt}'")
+    logger.info(f"🤖 Model: '{model}' (None = use default)")
     
     try:
         # Read both files
@@ -50,12 +52,13 @@ async def analyze_game_with_openai_and_voice(
         question_text = openai_service.transcribe_audio(audio_data)
         logger.info(f"🎤 Transcribed question: '{question_text}'")
         
-        # Step 2: Analyze screenshot + question using OpenAI GPT-4 Vision
-        logger.info("🤖 Starting OpenAI GPT-4 Vision analysis...")
+        # Step 2: Analyze screenshot + question using OpenAI
+        logger.info("🤖 Starting OpenAI analysis...")
         ai_response = openai_service.analyze_game_situation(
             screenshot_bytes=image_data,
             question_text=question_text,
-            system_prompt=system_prompt
+            system_prompt=system_prompt,
+            model=model
         )
         logger.info(f"🤖 OpenAI analysis response: '{ai_response}'")
         
@@ -92,7 +95,8 @@ async def analyze_game_with_openai_text_only(
     question: str = Form(...),
     system_prompt: str = Form(
         default="You are a helpful game assistant. Analyze the screenshot and answer the user's question about the game situation. Provide specific, actionable advice for the player."
-    )
+    ),
+    model: str = Form(default=None)
 ) -> dict:
     """
     Analyze game screenshot and text question using OpenAI (no audio processing).
@@ -103,26 +107,34 @@ async def analyze_game_with_openai_text_only(
     logger.info(f"📸 Image file: {image.filename}, size: {image.size} bytes")
     logger.info(f"❓ Question: '{question}'")
     logger.info(f"🤖 System prompt: '{system_prompt}'")
+    logger.info(f"🤖 Model: '{model}' (None = use default)")
     
     try:
         # Read image file
         image_data = await image.read()
         logger.info(f"📸 Read image data: {len(image_data)} bytes")
         
-        # Analyze screenshot + question using OpenAI GPT-4 Vision
-        logger.info("🤖 Starting OpenAI GPT-4 Vision analysis...")
+        # Analyze screenshot + question using OpenAI
+        logger.info("🤖 Starting OpenAI analysis...")
         ai_response = openai_service.analyze_game_situation(
             screenshot_bytes=image_data,
             question_text=question,
-            system_prompt=system_prompt
+            system_prompt=system_prompt,
+            model=model
         )
         logger.info(f"🤖 OpenAI analysis response: '{ai_response}'")
+        
+        # Get actual model used
+        from ...core import get_server_config
+        config = get_server_config()
+        actual_model = model or config._get_default_openai_model()
         
         return {
             "success": True,
             "question": question,
             "response": ai_response,
-            "system_prompt": system_prompt
+            "system_prompt": system_prompt,
+            "model": actual_model
         }
         
     except Exception as e:
@@ -131,5 +143,6 @@ async def analyze_game_with_openai_text_only(
             "success": False,
             "error": str(e),
             "question": question,
-            "response": "Sorry, there was an error processing your request with OpenAI."
+            "response": "Sorry, there was an error processing your request with OpenAI.",
+            "model": model or "default"
         } 

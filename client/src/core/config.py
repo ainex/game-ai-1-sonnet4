@@ -17,6 +17,23 @@ class Config:
             "auto_show_overlay": True,  # Automatically show overlay on response
         }
         
+        # Model configuration
+        self.models = {
+            "default_model": "claude-4-sonnet",  # Default model for analysis
+            "available_claude_models": [
+                "claude-3.5-sonnet",
+                "claude-4-sonnet",
+                "claude-4-opus",
+                "claude-4-sonnet-thinking",
+                "claude-4-opus-thinking"
+            ],
+            "available_openai_models": [
+                "gpt-4o-mini",
+                "gpt-4o",
+                "o3"
+            ]
+        }
+        
         # Load user config if exists
         self.config_path = Path.home() / ".ai_gaming_assistant" / "config.json"
         self.load_config()
@@ -30,6 +47,9 @@ class Config:
                     # Update features with user preferences
                     if "features" in user_config:
                         self.features.update(user_config["features"])
+                    # Update models with user preferences
+                    if "models" in user_config:
+                        self.models.update(user_config["models"])
             except Exception as e:
                 print(f"Warning: Could not load config: {e}")
     
@@ -37,7 +57,10 @@ class Config:
         """Save current configuration to file."""
         self.config_path.parent.mkdir(parents=True, exist_ok=True)
         with open(self.config_path, 'w') as f:
-            json.dump({"features": self.features}, f, indent=2)
+            json.dump({
+                "features": self.features,
+                "models": self.models
+            }, f, indent=2)
     
     def get_feature(self, feature_name: str, default: bool = False) -> bool:
         """Get a feature flag value."""
@@ -47,6 +70,25 @@ class Config:
         """Set a feature flag value."""
         self.features[feature_name] = value
         self.save_config()
+    
+    def get_model(self, model_type: str = "default") -> str:
+        """Get model configuration."""
+        if model_type == "default":
+            return self.models.get("default_model", "claude-4-sonnet")
+        return self.models.get(model_type)
+    
+    def set_model(self, model_type: str, value: str):
+        """Set model configuration."""
+        self.models[model_type] = value
+        self.save_config()
+    
+    def get_available_models(self, provider: str) -> list:
+        """Get available models for a provider."""
+        if provider == "claude":
+            return self.models.get("available_claude_models", [])
+        elif provider == "openai":
+            return self.models.get("available_openai_models", [])
+        return []
 
 
 # Global config instance

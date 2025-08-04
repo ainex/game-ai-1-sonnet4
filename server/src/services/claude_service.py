@@ -31,6 +31,9 @@ except ImportError:
     logger.warning("⚠️ Anthropic library not available")
     anthropic = None
 
+# Import server config
+from ..core import get_server_config
+
 
 class ClaudeService:
     """Service for Anthropic Claude API integration."""
@@ -72,7 +75,8 @@ class ClaudeService:
         self, 
         screenshot_bytes: bytes, 
         question_text: str, 
-        system_prompt: str = "You are the greatest gamer and assistant. Here is my game situation screenshot and my question. Provide specific, actionable advice for the player."
+        system_prompt: str = "You are the greatest gamer and assistant. Here is my game situation screenshot and my question. Provide specific, actionable advice for the player.",
+        model: Optional[str] = None
     ) -> str:
         """
         Analyze a game screenshot and answer a question using Claude's vision model.
@@ -81,6 +85,7 @@ class ClaudeService:
             screenshot_bytes: Screenshot image as bytes
             question_text: User's question (transcribed from audio)
             system_prompt: System prompt for the AI assistant
+            model: Optional model name (e.g., "claude-3.5-sonnet", "claude-4-sonnet")
             
         Returns:
             AI response as text
@@ -117,10 +122,14 @@ class ClaudeService:
                 ]
             }
             
-            logger.info("🤖 Sending request to Claude 3.5 Sonnet...")
+            # Get the appropriate model from config
+            config = get_server_config()
+            model_name = config.get_claude_model(model)
+            
+            logger.info(f"🤖 Sending request to Claude model: {model_name}...")
             
             response = self._client.messages.create(
-                model="claude-3-5-sonnet-20241022",
+                model=model_name,
                 max_tokens=1000,
                 temperature=0.7,
                 system=system_prompt,

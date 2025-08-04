@@ -272,6 +272,9 @@ def _claude_analysis_main(overlay, recorder, config):
         # Prepare system prompt
         system_prompt = "You are the greatest gamer and assistant. Here is my game situation screenshot and my question. Provide specific, actionable advice for the player."
         
+        # Get the default model from config
+        default_model = config.get_model("default")
+        
         # Check if we need TTS or just text
         use_tts = config.get_feature("use_tts")
         
@@ -282,7 +285,10 @@ def _claude_analysis_main(overlay, recorder, config):
                 "image": ("screenshot.png", screenshot_buffer, "image/png"),
                 "audio": ("voice.wav", io.BytesIO(audio_bytes), "audio/wav")
             }
-            data = {"system_prompt": system_prompt}
+            data = {
+                "system_prompt": system_prompt,
+                "model": default_model
+            }
             
             response = requests.post(
                 "http://localhost:8000/api/v1/claude/analyze-game-with-voice",
@@ -296,7 +302,8 @@ def _claude_analysis_main(overlay, recorder, config):
             files = {"image": ("screenshot.png", screenshot_buffer, "image/png")}
             data = {
                 "question": user_question,
-                "system_prompt": system_prompt
+                "system_prompt": system_prompt,
+                "model": default_model
             }
             
             response = requests.post(
@@ -326,7 +333,7 @@ def _claude_analysis_main(overlay, recorder, config):
                 text_response = requests.post(
                     "http://localhost:8000/api/v1/claude/analyze-game-text-only",
                     files={"image": ("screenshot.png", screenshot_buffer, "image/png")},
-                    data={"question": user_question, "system_prompt": system_prompt},
+                    data={"question": user_question, "system_prompt": system_prompt, "model": default_model},
                     timeout=60
                 )
                 
@@ -352,8 +359,9 @@ def _claude_analysis_main(overlay, recorder, config):
                 
                 result = response.json()
                 ai_text = result.get('response', 'Analysis completed.')
-                logger.info(f"🤖 Claude response: {ai_text[:200]}...")
-                overlay.display_response(ai_text)
+                model_used = result.get('model', default_model)
+                logger.info(f"🤖 Claude response ({model_used}): {ai_text[:200]}...")
+                overlay.display_response(f"[{model_used}] {ai_text}")
         else:
             logger.error(f"❌ Request failed with status {response.status_code}")
             logger.error(f"❌ Response text: {response.text}")
@@ -586,6 +594,14 @@ def capture_screenshot_and_record_voice() -> None:
         logger.info("🤖 Sending screenshot + voice to OpenAI for analysis...")
         print("🤖 Analyzing screenshot and voice with OpenAI...")
         
+        # Get the default model from config (will use OpenAI default if it's not an OpenAI model)
+        default_model = config.get_model("default")
+        if default_model not in config.get_available_models("openai"):
+            # Use OpenAI default if configured model is not an OpenAI model
+            openai_model = None
+        else:
+            openai_model = default_model
+        
         # Prepare files for upload with system prompt
         screenshot_buffer.seek(0)
         files = {
@@ -595,6 +611,8 @@ def capture_screenshot_and_record_voice() -> None:
         data = {
             "system_prompt": "You are a helpful game assistant. Analyze the screenshot and answer the user's question about the game situation. Provide specific, actionable advice for the player."
         }
+        if openai_model:
+            data["model"] = openai_model
         
         response = requests.post(
             "http://localhost:8000/api/v1/openai/analyze-game-with-voice",

@@ -31,6 +31,9 @@ except ImportError:
     logger.warning("⚠️ OpenAI library not available")
     OpenAI = None
 
+# Import server config
+from ..core import get_server_config
+
 
 class OpenAIService:
     """Service for OpenAI API integration."""
@@ -72,7 +75,8 @@ class OpenAIService:
         self, 
         screenshot_bytes: bytes, 
         question_text: str, 
-        system_prompt: str = "You are a helpful game assistant. Analyze the screenshot and answer the user's question about the game situation."
+        system_prompt: str = "You are a helpful game assistant. Analyze the screenshot and answer the user's question about the game situation.",
+        model: Optional[str] = None
     ) -> str:
         """
         Analyze a game screenshot and answer a question using OpenAI's vision model.
@@ -81,6 +85,7 @@ class OpenAIService:
             screenshot_bytes: Screenshot image as bytes
             question_text: User's question (transcribed from audio)
             system_prompt: System prompt for the AI assistant
+            model: Optional model name (e.g., "gpt-4o-mini", "gpt-4o", "o3")
             
         Returns:
             AI response as text
@@ -121,10 +126,14 @@ class OpenAIService:
                 }
             ]
             
-            logger.info("🤖 Sending request to OpenAI GPT-4 Vision...")
+            # Get the appropriate model from config
+            config = get_server_config()
+            model_name = config.get_openai_model(model)
+            
+            logger.info(f"🤖 Sending request to OpenAI model: {model_name}...")
             
             response = self._client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=model_name,
                 messages=messages,
                 max_tokens=1000,
                 temperature=0.7

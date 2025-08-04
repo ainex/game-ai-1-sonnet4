@@ -25,7 +25,8 @@ async def analyze_game_with_claude_and_voice(
     audio: UploadFile = File(...),
     system_prompt: str = Form(
         default="You are the greatest gamer and assistant. Here is my game situation screenshot and my question. Provide specific, actionable advice for the player."
-    )
+    ),
+    model: str = Form(default=None)
 ) -> StreamingResponse:
     """
     Analyze game screenshot and voice question using Claude, then return spoken response.
@@ -39,6 +40,7 @@ async def analyze_game_with_claude_and_voice(
     logger.info(f"📸 Image file: {image.filename}, size: {image.size} bytes")
     logger.info(f"🎵 Audio file: {audio.filename}, size: {audio.size} bytes")
     logger.info(f"🤖 System prompt: '{system_prompt}'")
+    logger.info(f"🤖 Model: '{model}' (None = use default)")
     
     try:
         # Read both files
@@ -52,12 +54,13 @@ async def analyze_game_with_claude_and_voice(
         question_text = openai_service.transcribe_audio(audio_data)
         logger.info(f"🎤 Transcribed question: '{question_text}'")
         
-        # Step 2: Analyze screenshot + question using Claude 3.5 Sonnet
-        logger.info("🤖 Starting Claude 3.5 Sonnet analysis...")
+        # Step 2: Analyze screenshot + question using Claude
+        logger.info("🤖 Starting Claude analysis...")
         ai_response = claude_service.analyze_game_situation(
             screenshot_bytes=image_data,
             question_text=question_text,
-            system_prompt=system_prompt
+            system_prompt=system_prompt,
+            model=model
         )
         logger.info(f"🤖 Claude analysis response: '{ai_response}'")
         
@@ -94,7 +97,8 @@ async def analyze_game_with_claude_text_only(
     question: str = Form(...),
     system_prompt: str = Form(
         default="You are the greatest gamer and assistant. Here is my game situation screenshot and my question. Provide specific, actionable advice for the player."
-    )
+    ),
+    model: str = Form(default=None)
 ) -> dict:
     """
     Analyze game screenshot and text question using Claude (no audio processing).
@@ -105,27 +109,34 @@ async def analyze_game_with_claude_text_only(
     logger.info(f"📸 Image file: {image.filename}, size: {image.size} bytes")
     logger.info(f"❓ Question: '{question}'")
     logger.info(f"🤖 System prompt: '{system_prompt}'")
+    logger.info(f"🤖 Model: '{model}' (None = use default)")
     
     try:
         # Read image file
         image_data = await image.read()
         logger.info(f"📸 Read image data: {len(image_data)} bytes")
         
-        # Analyze screenshot + question using Claude 3.5 Sonnet
-        logger.info("🤖 Starting Claude 3.5 Sonnet analysis...")
+        # Analyze screenshot + question using Claude
+        logger.info("🤖 Starting Claude analysis...")
         ai_response = claude_service.analyze_game_situation(
             screenshot_bytes=image_data,
             question_text=question,
-            system_prompt=system_prompt
+            system_prompt=system_prompt,
+            model=model
         )
         logger.info(f"🤖 Claude analysis response: '{ai_response}'")
+        
+        # Get actual model used
+        from ...core import get_server_config
+        config = get_server_config()
+        actual_model = model or config.default_model
         
         return {
             "success": True,
             "question": question,
             "response": ai_response,
             "system_prompt": system_prompt,
-            "model": "claude-3-5-sonnet"
+            "model": actual_model
         }
         
     except Exception as e:
@@ -135,5 +146,5 @@ async def analyze_game_with_claude_text_only(
             "error": str(e),
             "question": question,
             "response": "Sorry, there was an error processing your request with Claude.",
-            "model": "claude-3-5-sonnet"
+            "model": model or "default"
         }
