@@ -19,7 +19,7 @@ class Config:
         
         # Model configuration
         self.models = {
-            "default_model": "claude-4-sonnet",  # Default model for analysis
+            "default_model": "gpt-5",  # Default model for analysis (OpenAI)
             "available_claude_models": [
                 "claude-3.5-sonnet",
                 "claude-4-sonnet",
@@ -28,8 +28,11 @@ class Config:
                 "claude-4-opus-thinking"
             ],
             "available_openai_models": [
-                "gpt-4o-mini",
+                # Curated Tier 1 set
+                "gpt-5",
+                "gpt-chat",        # Optional chat-optimized alias
                 "gpt-4o",
+                "gpt-4o-mini",
                 "o3"
             ]
         }

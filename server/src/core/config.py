@@ -40,11 +40,12 @@ class ServerConfig:
         }
         
         self.openai_models: Dict[str, str] = {
-            "gpt-4o-mini": "gpt-4o-mini",
+            # Curated Tier 1 set (no fallbacks)
+            "gpt-5": "gpt-5",                  # No aliasing/fallback
+            "gpt-chat": "gpt-5-chat-latest",  # Chat-optimized model
             "gpt-4o": "gpt-4o",
-            "o3": "gpt-4o",  # Using gpt-4o until o3 is available
-            # When o3 is released, update to:
-            # "o3": "o3",
+            "gpt-4o-mini": "gpt-4o-mini",
+            "o3": "o3",
         }
         
         # System prompts
@@ -78,8 +79,9 @@ class ServerConfig:
         
         model_name = self.openai_models.get(requested_model)
         if model_name is None:
-            logger.warning(f"⚠️ Unknown OpenAI model: {requested_model}, using default")
-            model_name = self.openai_models.get(self._get_default_openai_model(), "gpt-4o-mini")
+            # No fallback: be explicit and fail fast
+            logger.error(f"❌ Unknown OpenAI model requested: {requested_model}")
+            raise ValueError(f"Unknown OpenAI model: {requested_model}")
         
         logger.info(f"🤖 Using OpenAI model: {requested_model} -> {model_name}")
         return model_name
@@ -92,9 +94,13 @@ class ServerConfig:
     
     def _get_default_openai_model(self) -> str:
         """Get the default model for OpenAI based on configuration."""
-        if self.default_model in ["gpt-4o-mini", "gpt-4o", "o3"]:
+        if self.default_model in [
+            "gpt-5", "gpt-chat",
+            "gpt-4o", "gpt-4o-mini", "o3"
+        ]:
             return self.default_model
-        return "gpt-4o-mini"  # Default OpenAI model
+        # Default to GPT-5 as requested; no internal fallback
+        return "gpt-5"
     
     def get_available_models(self) -> Dict[str, list]:
         """Get all available models."""
